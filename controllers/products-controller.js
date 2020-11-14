@@ -44,7 +44,6 @@ const getProductByName = async (req, res, next) => {
     const name = req.params.pid;
     let re = `/${name}/i`;
     let products;
-    console.log(re)
     try {
         products = await Product.find({ name:  { $regex: name, $options: 'i'} })
         //see if it works. otherwise look into angela's or something.
@@ -62,7 +61,6 @@ const getProductByName = async (req, res, next) => {
 
 const createProduct = async (req, res, next) => {
     const { name, unit, price } = req.body;
-    console.table(req.body)
     let code;
     try {
         code = productCodeCreator();
@@ -104,7 +102,6 @@ const createProduct = async (req, res, next) => {
 
 
 const updateProduct = async (req, res, next) => {
-    console.table(req.body)
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
         return next(new HttpError('Invalid inputs passed, please check your data', 422))

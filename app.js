@@ -11,7 +11,7 @@ const mongoose = require('mongoose');
 const HttpError = require('./models/http-error')
 
 const productsRoutes = require('./routes/products-routes');
-//const usersRoutes = require('./routes/users-routes')
+const usersRoutes = require('./routes/users-routes')
 
 const app = express();
 app.use(bodyParser.json())
@@ -30,7 +30,7 @@ mongoose.set('useCreateIndex', true);
 
 
 app.use('/api/products', productsRoutes)
-//app.use('/api/users', usersRoutes)
+app.use('/api/users', usersRoutes)
 app.use((req, res, next) => {
     const error = new HttpError('Could not find this route.', 404);
     throw error;
@@ -54,7 +54,7 @@ mongoose
     .connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@ch77ecked.eih2z.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`,
         { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
-        app.listen(2000 || process.env.PORT, () => console.log('its running'));//delete console log
+        app.listen(2000 || process.env.PORT, () => console.log('its running'));
     })
     .catch(err => {
         console.log(err)

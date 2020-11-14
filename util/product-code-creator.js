@@ -1,6 +1,4 @@
 
-
-
 const productCodeCreator = () => {
     let productCode = [];
     let numb;
@@ -8,13 +6,8 @@ const productCodeCreator = () => {
         numb = Math.random() * 10;
         productCode.push(Math.floor(numb))
     }
-
-
     return productCode.join('');
 }
-
-
-
 
 
 module.exports = productCodeCreator

@@ -5,12 +5,15 @@ const jwt = require('jsonwebtoken')
 
 const { validationResult } = require('express-validator');
 
+const getCoordsForAddress = require('../util/location');
+
+
 const HttpError = require('../models/http-error');
 const User = require('../models/user')
 
 
-const getUsers = async () => {
-
+const getUsers = async (req, res, next) => {
+    const { email, name } = req.body;
     let users;
     try {
         users = await User.find({}, '-password')
@@ -24,36 +27,62 @@ const getUsers = async () => {
 const signup = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        const error = new HttpError('Invalid inputs passed, please check your data', 422)
+
+        const error = new HttpError(
+            'Invalid inputs passed, please check your data',
+            422
+        )
         return next(error)
     }
 
-    const { name, email, password } = req.body;
+    const { fName, lName, email, password, address } = req.body;
 
     let existingUser;
     try {
         existingUser = await User.findOne({ email: email })
     } catch (err) {
-        return next(new HttpError('This user does not exist in the database', 500))
+        return next(new HttpError(
+            'This user does not exist in the database',
+            500
+        ))
     }
     if (existingUser) {
-        return next(new HttpError('The email you entered, is already in use', 500))
+        return next(new HttpError(
+            'The email you entered, is already in use',
+            500
+        ))
     }
 
     let hashedPassword;
     try {
         hashedPassword = await bcrypt.hash(password, 12)
     } catch (err) {
-        return next(new HttpError('Could not create user, please try again.', 500))
+
+        return next(new HttpError(
+            'Could not create user, please try again.',
+            500
+        ))
+    }
+
+    let coordinates;
+    try {
+        coordinates = await getCoordsForAddress(address)
+    } catch (error) {
+
+        return next(error)
     }
 
     const createdUser = new User({
-        name,
+        fName,
+        lName,
         email,
-        password: hashedPassword
+        password: hashedPassword,
+        address,
+        location: coordinates
     })
 
     try {
+
         createdUser.save();
 
     } catch (err) {
@@ -64,6 +93,7 @@ const signup = async (req, res, next) => {
 
     let token;
     try {
+
         token = jwt.sign({ userId: createdUser.id, email: createdUser.email },
             process.env.JWT_KEY,
             { expiresIn: '1h' }
@@ -79,7 +109,9 @@ const signup = async (req, res, next) => {
 
 }
 
-const login = async (req, res, next) => {
+
+
+const signin = async (req, res, next) => {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -111,13 +143,13 @@ const login = async (req, res, next) => {
 
     let token;
     try {
-        token = jwt.sign({ userId: createdUser.id, email: createdUser.email },
+        token = jwt.sign({ userId: existingUser.id, email: existingUser.email },
             process.env.JWT_KEY,
             { expiresIn: '1h' }
         )
     } catch (err) {
 
-        return next(new HttpError(' Signing up failed, please try again', 500))
+        return next(new HttpError(' Signing in failed, please try again', 500))
     }
 
     res
@@ -133,4 +165,4 @@ const login = async (req, res, next) => {
 
 exports.getUsers = getUsers;
 exports.signup = signup;
-exports.login = login;
+exports.signin = signin;
