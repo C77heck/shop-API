@@ -3,7 +3,9 @@ const HttpError = require('../models/http-error');
 
 
 async function getCoordsForAddress(address) {
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)},+Mountain+View,+CA&key=${process.env.GOOGLE_API_KEY}`;
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+        address
+        )}&key=${process.env.GOOGLE_API_KEY}`;
     const response = await axios.get(url);
 
     const data = response.data;
@@ -14,8 +16,8 @@ async function getCoordsForAddress(address) {
         );
         throw error;
     }
-    console.table(data)
-    const coordinates = data.candidates[0].geometry.location;
+    console.log(data.results[0].plus_code.global_code)
+    const coordinates = data.results[0].geometry.location;
 
     return coordinates;
 }

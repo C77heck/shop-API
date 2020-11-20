@@ -45,7 +45,7 @@ const getProductByName = async (req, res, next) => {
     let re = `/${name}/i`;
     let products;
     try {
-        products = await Product.find({ name:  { $regex: name, $options: 'i'} })
+        products = await Product.find({ name: { $regex: name, $options: 'i' } })
         //see if it works. otherwise look into angela's or something.
 
     } catch (err) {
@@ -74,6 +74,7 @@ const createProduct = async (req, res, next) => {
     }
 
     const errors = validationResult(req)
+    console.log(errors)
     if (!errors.isEmpty()) {
         return next(new HttpError('Invalid inputs passed, please check your data', 422))
     }
@@ -102,7 +103,10 @@ const createProduct = async (req, res, next) => {
 
 
 const updateProduct = async (req, res, next) => {
+    console.table(req.body)
+    console.log(req.file.path)
     const errors = validationResult(req)
+    console.log(errors)
     if (!errors.isEmpty()) {
         return next(new HttpError('Invalid inputs passed, please check your data', 422))
     }
@@ -116,7 +120,8 @@ const updateProduct = async (req, res, next) => {
             name: name,
             unit: unit,
             price: price,
-            code: productId
+            code: productId,
+            image: req.file.path
         })
     } catch (err) {
         return next(new HttpError('Something went wrong, could not update product', 500))

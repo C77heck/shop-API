@@ -27,7 +27,7 @@ const getUsers = async (req, res, next) => {
 const signup = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-
+        console.log(errors)
         const error = new HttpError(
             'Invalid inputs passed, please check your data',
             422
@@ -35,7 +35,7 @@ const signup = async (req, res, next) => {
         return next(error)
     }
 
-    const { fName, lName, email, password, address } = req.body;
+    const { fullName, email, password, phone, address } = req.body;
 
     let existingUser;
     try {
@@ -67,16 +67,17 @@ const signup = async (req, res, next) => {
     let coordinates;
     try {
         coordinates = await getCoordsForAddress(address)
+        console.table(coordinates)
     } catch (error) {
 
         return next(error)
     }
 
     const createdUser = new User({
-        fName,
-        lName,
+        fullName,
         email,
         password: hashedPassword,
+        phone,
         address,
         location: coordinates
     })
@@ -105,7 +106,7 @@ const signup = async (req, res, next) => {
 
     res
         .status(201)
-        .json({ userId: createdUser.id, email: createdUser.email, token: token })
+        .json({ userLocation: createdUser.location, userId: createdUser.id, email: createdUser.email, token: token })
 
 }
 
@@ -120,7 +121,7 @@ const signin = async (req, res, next) => {
     }
 
     const { email, password } = req.body;
-
+    console.log(email + ' ' + password)
     let existingUser;
 
     try {
