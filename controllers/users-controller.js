@@ -153,12 +153,18 @@ const signin = async (req, res, next) => {
         return next(new HttpError(' Signing in failed, please try again', 500))
     }
 
+    isAdmin = false;
+    if (existingUser.isAdmin) {
+        isAdmin = true;
+    }
+
     res
         .json({
             message: 'Succesful login',
             userId: existingUser.id,
             email: existingUser.email,
-            token: token
+            token: token,
+            isAdmin: isAdmin
         })
 
 }
