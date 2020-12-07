@@ -16,9 +16,11 @@ async function getCoordsForAddress(address) {
         );
         throw error;
     }
-    console.log(data.results[0].plus_code.global_code)
-    const coordinates = data.results[0].geometry.location;
-
+    //const coordinates = data.results[0].geometry.location;
+    const coordinates = {
+        lat: 40.7477499,
+        lng: 73.9850813
+    }
     return coordinates;
 }
 

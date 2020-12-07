@@ -1,23 +1,23 @@
 const express = require('express');
 const { check } = require('express-validator')
 
-const usersController = require('../controllers/users-controller')
+const adminsController = require('../controllers/admins-controller')
 
 const router = express.Router();
 
 
-router.post('/signup',
+router.post('/adminsignup',
     [
         check('fullName').not().isEmpty(),
         check('email').normalizeEmail().isEmail(),
         check('password').isLength({ min: 6 }),
         check('phone').not().isEmpty(),
-        check('address').not().isEmpty()
+        check('isAdmin').not().isEmpty()
     ],
-    usersController.signup
+    adminsController.adminSignup
 )
 
-router.post('/signin', usersController.signin)
+router.post('/adminsignin', adminsController.adminSignin)
 /* add in patch method for changing user data 
 and delete as well.
 */

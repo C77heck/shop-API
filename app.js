@@ -12,6 +12,8 @@ const HttpError = require('./models/http-error')
 
 const productsRoutes = require('./routes/products-routes');
 const usersRoutes = require('./routes/users-routes')
+const adminsRoutes = require('./routes/admins-routes')
+
 
 const app = express();
 app.use(bodyParser.json())
@@ -31,6 +33,9 @@ mongoose.set('useCreateIndex', true);
 
 app.use('/api/products', productsRoutes)
 app.use('/api/users', usersRoutes)
+app.use('/api/users', usersRoutes)
+app.use('/admin', adminsRoutes)
+
 app.use((req, res, next) => {
     const error = new HttpError('Could not find this route.', 404);
     throw error;

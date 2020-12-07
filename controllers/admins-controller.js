@@ -5,18 +5,25 @@ const jwt = require('jsonwebtoken')
 
 const { validationResult } = require('express-validator');
 
-const getCoordsForAddress = require('../util/location');
-
-
 const HttpError = require('../models/http-error');
-const User = require('../models/user');
+const Admin = require('../models/admin');
 
 
+const getUsers = async (req, res, next) => {
+    const { email, name } = req.body;
+    let users;
+    try {
+        users = await User.find({}, '-password')
+    } catch (err) {
+        console.log(err)
+    }
 
-
-const signup = async (req, res, next) => {
+    res.json({ users: users.map(u => u.toObject({ getters: true })) })
+}
+const adminSignup = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+        console.log(errors)
         const error = new HttpError(
             'Invalid inputs passed, please check your data',
             422
@@ -24,18 +31,18 @@ const signup = async (req, res, next) => {
         return next(error)
     }
 
-    const { fullName, email, password, phone, address } = req.body;
+    const { fullName, email, password, phone, isAdmin } = req.body;
 
-    let existingUser;
+    let existingAdmin;
     try {
-        existingUser = await User.findOne({ email: email })
+        existingAdmin = await Admin.findOne({ email: email })
     } catch (err) {
         return next(new HttpError(
             'This user does not exist in the database',
             500
         ))
     }
-    if (existingUser) {
+    if (existingAdmin) {
         return next(new HttpError(
             'The email you entered, is already in use',
             500
@@ -48,31 +55,23 @@ const signup = async (req, res, next) => {
     } catch (err) {
 
         return next(new HttpError(
-            'Could not create user, please try again.',
+            'Could not create admin, please try again.',
             500
         ))
     }
 
-    let coordinates;
-    try {
-        coordinates = await getCoordsForAddress(address)
-    } catch (error) {
 
-        return next(error)
-    }
-
-    const createdUser = new User({
+    const createdAdmin = new Admin({
         fullName,
         email,
         password: hashedPassword,
         phone,
-        address,
-        location: coordinates
+        isAdmin
     })
 
     try {
 
-        createdUser.save();
+        createdAdmin.save();
 
     } catch (err) {
         const error = new HttpError(' Signing up failed, please try again', 500)
@@ -83,7 +82,7 @@ const signup = async (req, res, next) => {
     let token;
     try {
 
-        token = jwt.sign({ userId: createdUser.id, email: createdUser.email },
+        token = jwt.sign({ userId: createdAdmin.id, email: createdAdmin.email },
             process.env.JWT_KEY,
             { expiresIn: '1h' }
         )
@@ -94,13 +93,16 @@ const signup = async (req, res, next) => {
 
     res
         .status(201)
-        .json({ userLocation: createdUser.location, userId: createdUser.id, email: createdUser.email, token: token })
+        .json({
+            userId: createdUser.id,
+            email: createdUser.email,
+            token: token,
+            isAdmin: createdAdmin.isAdmin
+        })
 
 }
 
-
-
-const signin = async (req, res, next) => {
+const adminSignin = async (req, res, next) => {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -109,29 +111,29 @@ const signin = async (req, res, next) => {
     }
 
     const { email, password } = req.body;
-    let existingUser;
+    let existingAdmin;
 
     try {
-        existingUser = await User.findOne({ email: email })
+        existingAdmin = await Admin.findOne({ email: email })
     } catch (err) {
         return next(new HttpError(`Login failed, please try again later.`, 500))
     }
 
-    if (!existingUser) {
+    if (!existingAdmin) {
         return next(new HttpError('Invalid credentials, please try again.', 401))
     }
 
     let isValidPassword = false;
 
     try {
-        isValidPassword = await bcrypt.compare(password, existingUser.password)
+        isValidPassword = await bcrypt.compare(password, existingAdmin.password)
     } catch (err) {
         return next(new HttpError('Could not log you in, please check your credentials and try again', 500))
     }
 
     let token;
     try {
-        token = jwt.sign({ userId: existingUser.id, email: existingUser.email },
+        token = jwt.sign({ userId: existingAdmin.id, email: existingAdmin.email },
             process.env.JWT_KEY,
             { expiresIn: '1h' }
         )
@@ -144,13 +146,15 @@ const signin = async (req, res, next) => {
     res
         .json({
             message: 'Succesful login',
-            userId: existingUser.id,
-            email: existingUser.email,
+            userId: existingAdmin.id,
+            email: existingAdmin.email,
             token: token,
+            isAdmin: existingAdmin.isAdmin
         })
 
 }
 
 
-exports.signup = signup;
-exports.signin = signin;
+exports.getUsers = getUsers;
+exports.adminSignup = adminSignup;
+exports.adminSignin = adminSignin;
