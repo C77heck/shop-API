@@ -19,8 +19,8 @@ router.post('/signup',
 router.post('/signin', usersController.signin)
 
 router.use(checkAuth)
-
 router.patch('/update', usersController.addDeliveryInstructions)
+
 /* add in patch method for changing user data 
 and delete as well.
 */

@@ -13,7 +13,7 @@ const userSchema = new Schema({
     lat: { type: Number, required: true },
     lng: { type: Number, required: true }
   },
-  instructions: { type: String, required: false }
+  instructions: { type: String }
 });
 
 userSchema.plugin(uniqueValidator);

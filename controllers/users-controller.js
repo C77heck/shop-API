@@ -67,7 +67,8 @@ const signup = async (req, res, next) => {
         password: hashedPassword,
         phone,
         address,
-        location: coordinates
+        location: coordinates,
+        instructions: ''
     })
 
     try {
@@ -94,7 +95,11 @@ const signup = async (req, res, next) => {
 
     res
         .status(201)
-        .json({ userLocation: createdUser.location, userId: createdUser.id, email: createdUser.email, token: token })
+        .json({
+            userLocation: createdUser.location,
+            userId: createdUser.id, email: createdUser.email,
+            token: token
+        })
 
 }
 
@@ -150,11 +155,11 @@ const signin = async (req, res, next) => {
         })
 
 }
-const addDeliveryInstructions = (req, res, nest) => {
-    const { instructions, email } = req.body;
+const addDeliveryInstructions = async (req, res, next) => {
+    const { instructions, userId } = req.body;
     let existingUser
     try {
-        existingUser = await User.findOne({ email: email })
+        existingUser = await User.findOne({ userId: userId })
     } catch (err) {
         return next(new HttpError(`Login failed, please try again later.`, 500))
     }
@@ -164,6 +169,7 @@ const addDeliveryInstructions = (req, res, nest) => {
     } catch (err) {
         console.log(err)
     }
+    console.log(instructions, email, existingUser)
 
     res.json({ instructions: instructions })
 }
