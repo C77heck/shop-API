@@ -150,7 +150,24 @@ const signin = async (req, res, next) => {
         })
 
 }
+const addDeliveryInstructions = (req, res, nest) => {
+    const { instructions, email } = req.body;
+    let existingUser
+    try {
+        existingUser = await User.findOne({ email: email })
+    } catch (err) {
+        return next(new HttpError(`Login failed, please try again later.`, 500))
+    }
+    existingUser.instructions = instructions;
+    try {
+        await existingUser.save();
+    } catch (err) {
+        console.log(err)
+    }
 
+    res.json({ instructions: instructions })
+}
 
 exports.signup = signup;
 exports.signin = signin;
+exports.addDeliveryInstructions = addDeliveryInstructions;

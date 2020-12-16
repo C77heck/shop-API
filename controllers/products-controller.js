@@ -103,8 +103,6 @@ const createProduct = async (req, res, next) => {
 
 
 const updateProduct = async (req, res, next) => {
-    console.table(req.body)
-    console.log(req.file.path)
     const errors = validationResult(req)
     console.log(errors)
     if (!errors.isEmpty()) {

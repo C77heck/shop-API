@@ -12,7 +12,8 @@ const userSchema = new Schema({
   location: {
     lat: { type: Number, required: true },
     lng: { type: Number, required: true }
-  }
+  },
+  instructions: { type: String, required: false }
 });
 
 userSchema.plugin(uniqueValidator);
