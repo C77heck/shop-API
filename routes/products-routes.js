@@ -6,8 +6,6 @@ const productsControllers = require('../controllers/products-controller');
 
 const Product = require('../models/product')
 
-const HttpError = require('../models/http-error')
-
 const router = express.Router();
 
 

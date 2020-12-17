@@ -68,7 +68,9 @@ const signup = async (req, res, next) => {
         phone,
         address,
         location: coordinates,
-        instructions: ''
+        instructions: '',
+        orders: [{}]
+
     })
 
     try {

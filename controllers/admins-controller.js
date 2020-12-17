@@ -7,6 +7,31 @@ const { validationResult } = require('express-validator');
 
 const HttpError = require('../models/http-error');
 const Admin = require('../models/admin');
+const User = require('../models/user');
+const Order = require('../models/order');
+
+const getOrders = async (req, res, next) => {
+    let orders;
+    try {
+        orders = await Order.find();
+    } catch (err) {
+        return next(new HttpError(
+            err,
+            422
+        ))
+    }
+    let user;
+    try {
+        user = await User.find({ ObjectId: orders.creator });
+
+    } catch (err) {
+        return next(new HttpError(
+            'Something went wrong',
+            500
+        ))
+    }
+    res.json({ orders: orders, user: user })
+}
 
 
 const getUsers = async (req, res, next) => {
@@ -158,3 +183,4 @@ const adminSignin = async (req, res, next) => {
 exports.getUsers = getUsers;
 exports.adminSignup = adminSignup;
 exports.adminSignin = adminSignin;
+exports.getOrders = getOrders;

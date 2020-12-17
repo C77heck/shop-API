@@ -13,7 +13,9 @@ const userSchema = new Schema({
     lat: { type: Number, required: true },
     lng: { type: Number, required: true }
   },
-  instructions: { type: String }
+  instructions: { type: String },
+  orders: [{ type: mongoose.Types.ObjectId, required: true, ref: 'Order' }]
+
 });
 
 userSchema.plugin(uniqueValidator);

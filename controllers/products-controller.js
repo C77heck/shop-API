@@ -2,7 +2,6 @@
 const fs = require('fs');
 
 const HttpError = require('../models/http-error');
-const mongoose = require('mongoose');
 const { validationResult } = require('express-validator');
 
 const productCodeCreator = require('../util/product-code-creator')
