@@ -12,6 +12,7 @@ const createOrder = async (req, res, next) => {
     const errors = validationResult(req)
     console.log(errors)
     if (!errors.isEmpty()) {
+        //   console.log(errors)
         return next(new HttpError(
             'Sorry but something went wrong and could not process your order',
             422
@@ -37,7 +38,7 @@ const createOrder = async (req, res, next) => {
 
     try {
         const session = await mongoose.startSession();
-        session.withTransaction();
+        session.startTransaction();
         createdOrder.save(session);
         user.orders.push(createdOrder)
         await user.save(session)

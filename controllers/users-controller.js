@@ -69,18 +69,15 @@ const signup = async (req, res, next) => {
         address,
         location: coordinates,
         instructions: '',
-        orders: [{}]
+        orders: []
 
     })
 
     try {
-
         createdUser.save();
-
     } catch (err) {
         const error = new HttpError(' Signing up failed, please try again', 500)
         return next(error)
-
     }
 
     let token;
@@ -159,23 +156,39 @@ const signin = async (req, res, next) => {
 }
 const addDeliveryInstructions = async (req, res, next) => {
     const { instructions, userId } = req.body;
-    let existingUser
+    let existingUser;
     try {
-        existingUser = await User.findOne({ userId: userId })
+        existingUser = await User.findById(userId)
     } catch (err) {
-        return next(new HttpError(`Login failed, please try again later.`, 500))
+        return next(new HttpError(err, 500))
     }
-    existingUser.instructions = instructions;
     try {
+        existingUser.instructions = instructions;
         await existingUser.save();
     } catch (err) {
-        console.log(err)
+        return next(new HttpError(err, 500))
     }
-    console.log(instructions, email, existingUser)
 
     res.json({ instructions: instructions })
+}
+
+
+const getUserInfo = async (req, res, next) => {
+    const userId = req.params.pid;
+    let user;
+    try {
+        user = await User.findById(userId)
+    } catch (err) {
+        return next(new HttpError(
+            'Something went wrong, could not find user',
+            500))
+    }
+
+    res.json({ userData: user })
+
 }
 
 exports.signup = signup;
 exports.signin = signin;
 exports.addDeliveryInstructions = addDeliveryInstructions;
+exports.getUserInfo = getUserInfo;

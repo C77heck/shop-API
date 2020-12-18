@@ -17,6 +17,7 @@ router.post('/signup',
     usersController.signup
 )
 router.post('/signin', usersController.signin)
+router.get('/userinfo/:pid', usersController.getUserInfo)
 
 router.use(checkAuth)
 router.patch('/update', usersController.addDeliveryInstructions)

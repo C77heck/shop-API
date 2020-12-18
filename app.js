@@ -30,10 +30,10 @@ app.use((req, res, next) => {
 mongoose.set('useCreateIndex', true);
 
 
-app.use('/api/orders', ordersRoutes)
 app.use('/api/products', productsRoutes)
 app.use('/api/users', usersRoutes)
 app.use('/api/admin', adminsRoutes)
+app.use('/api/orders', ordersRoutes)
 
 
 app.use((req, res, next) => {
