@@ -19,8 +19,19 @@ router.post('/signup',
 router.post('/signin', usersController.signin)
 router.get('/userinfo/:pid', usersController.getUserInfo)
 
-router.use(checkAuth)
-router.patch('/update', usersController.addDeliveryInstructions)
+router.use(checkAuth);
+
+router.patch('/update/:pid', [
+    check('fullName').not().isEmpty(),
+    check('email').normalizeEmail().isEmail(),
+    check('phone').not().isEmpty(),
+    check('address').not().isEmpty()
+],
+    usersController.updateUserData);
+
+router.patch('/update/deliveryinstructions', usersController.addDeliveryInstructions)
+
+
 
 /* add in patch method for changing user data 
 and delete as well.

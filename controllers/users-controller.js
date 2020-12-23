@@ -62,11 +62,19 @@ const signup = async (req, res, next) => {
     }
 
     const createdUser = new User({
-        fullName,
+        fullName: {
+            firstName: fullName.firstName,
+            lastName: fullName.lastName
+        },
         email,
         password: hashedPassword,
         phone,
-        address,
+        address: {
+            city: address.city,
+            street: address.street,
+            postCode: address.postCode,
+            houseNumber: address.houseNumber
+        },
         location: coordinates,
         instructions: '',
         orders: []
@@ -154,6 +162,48 @@ const signin = async (req, res, next) => {
         })
 
 }
+
+const updateUserData = async (req, res, next) => {
+    const userId = req.params.pid;
+    const { fullName, email, phone, address, instructions } = req.body;
+
+    let user;
+    try {
+        user = await User.findById(userId)
+    } catch (err) {
+        return next(new HttpError(err, 500))
+    }
+
+    let coordinates;
+    try {
+        coordinates = await getCoordsForAddress(address)
+    } catch (error) {
+
+        return next(error)
+    }
+
+    console.log(user)
+    console.log(fullName)
+    if (user !== null) {
+        try {
+            user.fullName = fullName;
+            user.email = email;
+            user.phone = phone;
+            user.address = address;
+            user.location = coordinates;
+            user.instructions = instructions;
+            await user.save();
+        } catch (err) {
+            return next(new HttpError(err, 500))
+
+        }
+    } else {
+        console.log(`user was not found by the user id of ${userId}`)
+    }
+
+    res.status(201).json({ userData: user })
+}
+
 const addDeliveryInstructions = async (req, res, next) => {
     const { instructions, userId } = req.body;
     let existingUser;
@@ -192,3 +242,4 @@ exports.signup = signup;
 exports.signin = signin;
 exports.addDeliveryInstructions = addDeliveryInstructions;
 exports.getUserInfo = getUserInfo;
+exports.updateUserData = updateUserData;
