@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken')
 const { validationResult } = require('express-validator');
 
 const getCoordsForAddress = require('../util/location');
-
+const sendEmailTo = require('../util/email');
 
 const HttpError = require('../models/http-error');
 const User = require('../models/user');
@@ -238,8 +238,35 @@ const getUserInfo = async (req, res, next) => {
 
 }
 
+
+const passwordRecovery = async (req, res, next) => {
+    const { email } = req.body;
+    console.log('notice this ', email)
+    let user;
+    try {
+        user = await User.find({ email: email })
+    } catch (err) {
+        return next(new HttpError(
+            'This email address is not associated'
+            +
+            ' with any of the accounts in our database please'
+            +
+            'check your email address and try again'
+            , 400)
+        )
+    }
+    
+    if (user) {
+        sendEmailTo(email)
+    }
+
+    res.json({ message: 'it worked. now delete me...' })
+}
+
+
 exports.signup = signup;
 exports.signin = signin;
 exports.addDeliveryInstructions = addDeliveryInstructions;
 exports.getUserInfo = getUserInfo;
 exports.updateUserData = updateUserData;
+exports.passwordRecovery = passwordRecovery;

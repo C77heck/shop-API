@@ -6,6 +6,11 @@ const usersController = require('../controllers/users-controller')
 
 const router = express.Router();
 
+router.post('/update/passwordrecovery',
+    [check('email').normalizeEmail().isEmail()]
+    , usersController.passwordRecovery
+)
+
 router.post('/signup',
     [
         check('fullName').not().isEmpty(),
@@ -29,7 +34,11 @@ router.patch('/update/:pid', [
 ],
     usersController.updateUserData);
 
-router.patch('/update/deliveryinstructions', usersController.addDeliveryInstructions)
+
+
+router.patch('/update/deliveryinstructions',
+    usersController.addDeliveryInstructions
+)
 
 
 
