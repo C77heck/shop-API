@@ -13,10 +13,10 @@ const transporter = nodemailer.createTransport({
 const sendEmailTo = (email) => {
     console.log(email)
     const mailOptions = {
-        from: 'A.u.r.u.m.a.0.0@gmail.com',
+        from: 'NOREPLY-FURUMA@furuma.ltd.com',
         to: `${email}`,
         subject: 'Password recovery',
-        text: `Please click on the recovery link `
+        text: `Please click the link if you want to reset your password. `
             +
             process.env.RECOVERY_LINK
     };

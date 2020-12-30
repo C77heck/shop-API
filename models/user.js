@@ -22,7 +22,9 @@ const userSchema = new Schema({
     lng: { type: Number, required: true }
   },
   instructions: { type: String },
-  orders: [{ type: mongoose.Types.ObjectId, required: true, ref: 'Order' }]
+  orders: [{ type: mongoose.Types.ObjectId, required: true, ref: 'Order' }],
+  hint: { type: String, required: true },
+  answer: { type: String, required: true }
 
 });
 

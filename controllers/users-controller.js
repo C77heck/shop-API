@@ -24,7 +24,7 @@ const signup = async (req, res, next) => {
         return next(error)
     }
 
-    const { fullName, email, password, phone, address } = req.body;
+    const { fullName, email, password, phone, address, hint, answer } = req.body;
 
     let existingUser;
     try {
@@ -77,7 +77,9 @@ const signup = async (req, res, next) => {
         },
         location: coordinates,
         instructions: '',
-        orders: []
+        orders: [],
+        hint,
+        answer
 
     })
 
@@ -165,7 +167,7 @@ const signin = async (req, res, next) => {
 
 const updateUserData = async (req, res, next) => {
     const userId = req.params.pid;
-    const { fullName, email, phone, address, instructions } = req.body;
+    const { fullName, email, phone, address, instructions, hint, answer } = req.body;
 
     let user;
     try {
@@ -192,6 +194,8 @@ const updateUserData = async (req, res, next) => {
             user.address = address;
             user.location = coordinates;
             user.instructions = instructions;
+            user.hint = hint;
+            user.answer = answer
             await user.save();
         } catch (err) {
             return next(new HttpError(err, 500))
@@ -255,7 +259,7 @@ const passwordRecovery = async (req, res, next) => {
             , 400)
         )
     }
-    
+
     if (user) {
         sendEmailTo(email)
     }

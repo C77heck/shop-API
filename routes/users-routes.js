@@ -18,6 +18,8 @@ router.post('/signup',
         check('password').isLength({ min: 6 }),
         check('phone').not().isEmpty(),
         check('address').not().isEmpty(),
+        check('hint').not().isEmpty(),
+        check('answer').isLength({ min: 4 })
     ],
     usersController.signup
 )
