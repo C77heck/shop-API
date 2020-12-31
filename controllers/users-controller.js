@@ -217,17 +217,20 @@ const updateUserData = async (req, res, next) => {
 
 const addDeliveryInstructions = async (req, res, next) => {
     const { instructions, userId } = req.body;
-    let existingUser;
+    console.log('we got it')
+    console.log(instructions)
+
+    let user;
     try {
-        existingUser = await User.findById(userId)
+        user = await User.findById(userId)
     } catch (err) {
-        return next(new HttpError(err, 500))
+        return next(new HttpError('something is wrong', 500))
     }
     try {
-        existingUser.instructions = instructions;
-        await existingUser.save();
+        user.instructions = instructions;
+        await user.save();
     } catch (err) {
-        return next(new HttpError(err, 500))
+        return next(new HttpError('what is going on', 500))
     }
 
     res.json({ instructions: instructions })

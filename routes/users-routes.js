@@ -34,7 +34,7 @@ router.get('/userinfo/:pid', usersController.getUserInfo)
 
 router.use(checkAuth);
 
-router.patch('/update/:pid', [
+router.patch('/updatedata/:pid', [
     check('fullName').not().isEmpty(),
     check('email').normalizeEmail().isEmail(),
     check('phone').not().isEmpty(),
