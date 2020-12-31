@@ -5,6 +5,9 @@ const { validationResult } = require('express-validator');
 const Order = require('../models/order');
 const User = require('../models/user');
 
+const { orderConfirmation } = require('../util/email');
+const order = require('../models/order');
+
 
 const createOrder = async (req, res, next) => {
 
@@ -48,6 +51,14 @@ const createOrder = async (req, res, next) => {
             err,
             422
         ))
+
+    }
+
+    try {
+        const { email, id, fullName } = user;
+        const date = dateToBeDelivered.slice(0, 10).replace(/-/g, '.')
+        orderConfirmation(email, id, fullName.firstName, date);
+    } catch (err) {
 
     }
 

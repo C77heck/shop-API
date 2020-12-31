@@ -10,7 +10,13 @@ router.post('/update/passwordrecovery',
     [check('email').normalizeEmail().isEmail()]
     , usersController.passwordRecovery
 )
-
+router.patch('/updatepassword/:pid',
+    [
+        check('password').isLength({ min: 6 }),
+        check('answer').isLength({ min: 4 })
+    ],
+    usersController.PasswordReset
+)
 router.post('/signup',
     [
         check('fullName').not().isEmpty(),
@@ -44,9 +50,7 @@ router.patch('/update/deliveryinstructions',
 
 
 
-/* add in patch method for changing user data 
-and delete as well.
-*/
+
 
 
 

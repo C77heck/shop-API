@@ -6,11 +6,11 @@ const jwt = require('jsonwebtoken')
 const { validationResult } = require('express-validator');
 
 const getCoordsForAddress = require('../util/location');
-const sendEmailTo = require('../util/email');
+
+const { recoveryMessage } = require('../util/email');
 
 const HttpError = require('../models/http-error');
 const User = require('../models/user');
-
 
 
 
@@ -167,7 +167,15 @@ const signin = async (req, res, next) => {
 
 const updateUserData = async (req, res, next) => {
     const userId = req.params.pid;
-    const { fullName, email, phone, address, instructions, hint, answer } = req.body;
+    const {
+        fullName,
+        email,
+        phone,
+        address,
+        instructions,
+        hint,
+        answer
+    } = req.body;
 
     let user;
     try {
@@ -184,8 +192,7 @@ const updateUserData = async (req, res, next) => {
         return next(error)
     }
 
-    console.log(user)
-    console.log(fullName)
+
     if (user !== null) {
         try {
             user.fullName = fullName;
@@ -244,8 +251,9 @@ const getUserInfo = async (req, res, next) => {
 
 
 const passwordRecovery = async (req, res, next) => {
+
     const { email } = req.body;
-    console.log('notice this ', email)
+
     let user;
     try {
         user = await User.find({ email: email })
@@ -253,7 +261,7 @@ const passwordRecovery = async (req, res, next) => {
         return next(new HttpError(
             'This email address is not associated'
             +
-            ' with any of the accounts in our database please'
+            ' with any of the accounts in our database! Please'
             +
             'check your email address and try again'
             , 400)
@@ -261,12 +269,41 @@ const passwordRecovery = async (req, res, next) => {
     }
 
     if (user) {
-        sendEmailTo(email)
+        try {
+            recoveryMessage(email, user[0].id, user[0].fullName.firstName)
+        } catch (err) {
+
+        }
+
     }
 
-    res.json({ message: 'it worked. now delete me...' })
+    res.status(201);
 }
 
+const PasswordReset = async (req, res, next) => {
+
+    const { answer, password } = req.body;
+
+    const userId = req.params.pid;
+
+    let user;
+    try {
+        user = await User.findById(userId)
+    } catch (err) {
+        return next(new HttpError(err, 500))
+    }
+
+    try {
+        if (user.answer === answer) {
+            user.password = password;
+        }
+        await user.save();
+    } catch (err) {
+        return next(new HttpError(err, 500))
+    }
+
+    res.status(201);
+}
 
 exports.signup = signup;
 exports.signin = signin;
@@ -274,3 +311,4 @@ exports.addDeliveryInstructions = addDeliveryInstructions;
 exports.getUserInfo = getUserInfo;
 exports.updateUserData = updateUserData;
 exports.passwordRecovery = passwordRecovery;
+exports.PasswordReset = PasswordReset;
