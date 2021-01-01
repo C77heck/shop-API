@@ -16,7 +16,7 @@ const recoveryMessage = (email, requestID, name) => {
         to: `${email}`,
         subject: 'Password recovery',
         html: `<h3>Dear ${name},</h3>
-        <p>To reset your Ubisoft account password please </p>
+        <p>To reset your Furuma account password please </p>
         <a href=${process.env.RECOVERY_LINK}${requestID}>click here</a>
         <p>Sincerely,</p>
         <p>Furuma team</p>`
@@ -41,8 +41,6 @@ const orderConfirmation = (email, userID, name, date) => {
         <p>Thank you for your purchase, ${name}.</p>
         <p>Your order is confirmed</p>
         <p>We will deliver your order on ${date}</p>
-        <p>If you would like to amend your order then please</p>
-        <a href=${process.env.AMEND_ORDER}${userID}>click here</a>
         <p>Sincerely,</p>
         <p>Furuma team</p>`
     };
