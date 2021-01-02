@@ -6,6 +6,8 @@ const orderSchema = new Schema({
     products: { type: String, required: true },
     dateOrdered: { type: String, required: true },
     dateToBeDelivered: { type: String, required: true },
+    totalPrice: { type: String, required: true },
+    numberOfItems: { type: String, required: true },
     creator: { type: mongoose.Types.ObjectId, required: true, ref: 'User' }
 })
 

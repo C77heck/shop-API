@@ -6,12 +6,29 @@ const Order = require('../models/order');
 const User = require('../models/user');
 
 const { orderConfirmation } = require('../util/email');
-const order = require('../models/order');
 
+
+const getOrders = async (req, res, next) => {
+    const objectId = req.params.pid;
+    /* make sure to add in the token too for authentication purposes... */
+    let orders;
+    try {
+        orders = await Order.find({ creator: objectId })
+    } catch (err) {
+        console.log(err)
+    }
+    res.json({ orders: orders })
+}
 
 const createOrder = async (req, res, next) => {
 
-    const { products, dateOrdered, dateToBeDelivered, creator } = req.body;
+    const { products,
+        dateOrdered,
+        dateToBeDelivered,
+        totalPrice,
+        numberOfItems,
+        creator
+    } = req.body;
     const errors = validationResult(req)
     console.log(errors)
     if (!errors.isEmpty()) {
@@ -26,6 +43,8 @@ const createOrder = async (req, res, next) => {
         products,
         dateOrdered,
         dateToBeDelivered,
+        totalPrice,
+        numberOfItems,
         creator
     })
 
@@ -61,9 +80,11 @@ const createOrder = async (req, res, next) => {
     } catch (err) {
 
     }
+    console.log(createOrder)
 
     res.status(201).json({ order: createdOrder })
 
 }
 
 exports.createOrder = createOrder;
+exports.getOrders = getOrders;

@@ -296,9 +296,21 @@ const PasswordReset = async (req, res, next) => {
         return next(new HttpError(err, 500))
     }
 
+
+    let hashedPassword;
+    try {
+        hashedPassword = await bcrypt.hash(password, 12)
+    } catch (err) {
+
+        return next(new HttpError(
+            'Could not create user, please try again.',
+            500
+        ))
+    }
+
     try {
         if (user.answer === answer) {
-            user.password = password;
+            user.password = hashedPassword;
         }
         await user.save();
     } catch (err) {
