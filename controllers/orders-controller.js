@@ -74,9 +74,9 @@ const createOrder = async (req, res, next) => {
     }
 
     try {
-        const { email, id, fullName } = user;
+        const { email, fullName } = user;
         const date = dateToBeDelivered.slice(0, 10).replace(/-/g, '.')
-        orderConfirmation(email, id, fullName.firstName, date);
+        orderConfirmation(email, fullName.firstName, date);
     } catch (err) {
 
     }

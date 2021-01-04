@@ -10,14 +10,14 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASSWORD
     }
 });
-const recoveryMessage = (email, requestID, name) => {
+const recoveryMessage = (email, requestId, name) => {
     const mailOptions = {
         from: 'NOREPLY-FURUMA@furuma.ltd.com',
         to: `${email}`,
         subject: 'Password recovery',
         html: `<h3>Dear ${name},</h3>
         <p>To reset your Furuma account password please </p>
-        <a href=${process.env.RECOVERY_LINK}${requestID}>click here</a>
+        <a href=${process.env.RECOVERY_LINK}${requestId}>click here</a>
         <p>Sincerely,</p>
         <p>Furuma team</p>`
 
@@ -30,9 +30,13 @@ const recoveryMessage = (email, requestID, name) => {
             console.log('Email sent');
         }
     });
+
+    return true;
 }
 
-const orderConfirmation = (email, userID, name, date) => {
+
+
+const orderConfirmation = (email, name, date) => {
     const mailOptions = {
         from: 'NOREPLY-FURUMA@furuma.ltd.com',
         to: `${email}`,

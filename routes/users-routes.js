@@ -6,6 +6,9 @@ const usersController = require('../controllers/users-controller')
 
 const router = express.Router();
 
+router.get('/signout/:pid', usersController.signout)
+router.get('/gethint/:pid', usersController.getHint)
+
 router.post('/update/passwordrecovery',
     [check('email').normalizeEmail().isEmail()]
     , usersController.passwordRecovery
