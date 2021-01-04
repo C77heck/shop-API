@@ -25,11 +25,11 @@ const userSchema = new Schema({
   orders: [{ type: mongoose.Types.ObjectId, required: true, ref: 'Order' }],
   hint: { type: String, required: true },
   answer: { type: String, required: true },
-  status:{
-    isBlocked: {type: Boolean, required: true},
-    dateSinceBlocked: { type: Number },
-    loginAttempts: { type: Number, required: true }
-    }
+  status: {
+    isBlocked: { type: Boolean, required: true },
+    dateUntilBlocked: { type: String },
+    unblockTimer: { type: Number }
+  }
 
 });
 

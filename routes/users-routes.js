@@ -6,20 +6,7 @@ const usersController = require('../controllers/users-controller')
 
 const router = express.Router();
 
-router.get('/signout/:pid', usersController.signout)
-router.get('/gethint/:pid', usersController.getHint)
 
-router.post('/update/passwordrecovery',
-    [check('email').normalizeEmail().isEmail()]
-    , usersController.passwordRecovery
-)
-router.patch('/updatepassword/:pid',
-    [
-        check('password').isLength({ min: 6 }),
-        check('answer').isLength({ min: 4 })
-    ],
-    usersController.PasswordReset
-)
 router.post('/signup',
     [
         check('fullName').not().isEmpty(),

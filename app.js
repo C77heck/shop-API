@@ -14,6 +14,8 @@ const productsRoutes = require('./routes/products-routes');
 const usersRoutes = require('./routes/users-routes');
 const adminsRoutes = require('./routes/admins-routes');
 const ordersRoutes = require('./routes/orders-routes');
+const recoveryRoutes = require('./routes/recovery-routes');
+
 
 const app = express();
 app.use(bodyParser.json())
@@ -30,10 +32,12 @@ app.use((req, res, next) => {
 mongoose.set('useCreateIndex', true);
 
 
-app.use('/api/products', productsRoutes)
-app.use('/api/users', usersRoutes)
-app.use('/api/admin', adminsRoutes)
-app.use('/api/orders', ordersRoutes)
+app.use('/api/products', productsRoutes);
+app.use('/api/users', usersRoutes);
+app.use('/api/admin', adminsRoutes);
+app.use('/api/orders', ordersRoutes);
+app.use('/api/recovery', recoveryRoutes);
+
 
 
 app.use((req, res, next) => {
