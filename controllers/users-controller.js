@@ -86,8 +86,10 @@ const signup = async (req, res, next) => {
         hint,
         answer: answer.trim(),
         status: {
+            isLoggedIn: true,
             isBlocked: false,
-            loginAttempts: 0
+            loginAttempts: 0,
+            passwordRequest: false
         }
     })
 
@@ -184,11 +186,15 @@ const signin = async (req, res, next) => {
 
         existingUser.status.loginAttempts += 1;
         existingUser.save();
-        console.log(existingUser.status.loginAttempts)
         return next(new HttpError(
             'Could not log you in, please check your credentials and try again',
             500
         ))
+    } else {
+        existingUser.status.passwordRequest = 0;
+        existingUser.status.isLoggedIn = true;
+
+        existingUser.save();
     }
 
 
@@ -234,14 +240,15 @@ const signout = async (req, res, next) => {
     } catch (err) {
         console.log(err)
     }
-    console.log(user)
 
     try {
         user.status.loginAttempts = 0;
-        user.save();
+        user.status.isLoggedIn = false;
+        await user.save();
     } catch (err) {
         console.log(err)
     }
+    console.log(user)
 
     res.status(201)
 }
@@ -264,6 +271,8 @@ const updateUserData = async (req, res, next) => {
     } catch (err) {
         return next(new HttpError(err, 500))
     }
+
+
 
     let coordinates;
     try {
@@ -327,10 +336,32 @@ const getUserInfo = async (req, res, next) => {
             500))
     }
 
-    res.json({ userData: user })
+    
+    if (!user.status.isLoggedIn) {
+        throw new HttpError('Sorry but something went wrong.', 403)
+    }
+    
 
+    res.json({ userData: user })
 }
 
+const getUserHint = async (req, res, next) => {
+    const userId = req.params.pid;
+    let user;
+    try {
+        user = await User.findById(userId)
+    } catch (err) {
+        return next(new HttpError(
+            'Something went wrong, could not find user',
+            500))
+    }
+
+    if (!user.status.isLoggedIn) {
+        throw new HttpError('Sorry but something went wrong.', 403)
+    }
+
+    res.json({ hint: user.hint })
+}
 
 
 exports.signup = signup;
@@ -338,4 +369,5 @@ exports.signin = signin;
 exports.signout = signout;
 exports.addDeliveryInstructions = addDeliveryInstructions;
 exports.getUserInfo = getUserInfo;
+exports.getUserHint = getUserHint;
 exports.updateUserData = updateUserData;

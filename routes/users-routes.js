@@ -6,6 +6,8 @@ const usersController = require('../controllers/users-controller')
 
 const router = express.Router();
 
+router.get('/signout/:pid', usersController.signout)
+
 
 router.post('/signup',
     [
@@ -21,6 +23,7 @@ router.post('/signup',
 )
 router.post('/signin', usersController.signin)
 router.get('/userinfo/:pid', usersController.getUserInfo)
+router.get('/gethint/:pid', usersController.getUserHint)
 
 router.use(checkAuth);
 

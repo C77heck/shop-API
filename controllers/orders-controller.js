@@ -9,11 +9,23 @@ const { orderConfirmation } = require('../util/email');
 
 
 const getOrders = async (req, res, next) => {
-    const objectId = req.params.pid;
-    /* make sure to add in the token too for authentication purposes... */
+    const userId = req.params.pid;
+
+    let user;
+    try {
+        user = await User.findById(userId)
+    } catch (err) {
+        console.log(err)
+    }
+
+    if (!user.status.isLoggedIn) {
+        throw new HttpError('Sorry but something went wrong.', 403)
+    }
+
+
     let orders;
     try {
-        orders = await Order.find({ creator: objectId })
+        orders = await Order.find({ creator: userId })
     } catch (err) {
         console.log(err)
     }

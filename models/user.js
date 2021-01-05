@@ -26,9 +26,11 @@ const userSchema = new Schema({
   hint: { type: String, required: true },
   answer: { type: String, required: true },
   status: {
+    isLoggedIn: { type: Boolean, required: true },
     isBlocked: { type: Boolean, required: true },
     dateUntilBlocked: { type: String },
-    unblockTimer: { type: Number }
+    unblockTimer: { type: Number },
+    passwordRequest: { type: Number, require: true }
   }
 
 });

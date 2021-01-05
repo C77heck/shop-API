@@ -18,6 +18,7 @@ const recoveryMessage = (email, requestId, name) => {
         html: `<h3>Dear ${name},</h3>
         <p>To reset your Furuma account password please </p>
         <a href=${process.env.RECOVERY_LINK}${requestId}>click here</a>
+        <p>If it was not you please click <a href=${process.env.NOT_ME}${requestId}>NOT ME</a></p>
         <p>Sincerely,</p>
         <p>Furuma team</p>`
 
