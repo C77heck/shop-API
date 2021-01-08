@@ -341,8 +341,7 @@ const getUserInfo = async (req, res, next) => {
         throw new HttpError('Sorry but something went wrong.', 403)
     }
 
-
-    res.json({ userData: user })
+    res.json({ userData: user.address })
 }
 
 const getUserHint = async (req, res, next) => {
@@ -368,7 +367,6 @@ const favourtiesHandler = async (req, res, next) => {
     const userId = req.params.pid;
     const { productId } = req.body;
 
-    console.log(userId, productId)
     let user;
     try {
         user = await User.findById(userId);
@@ -390,9 +388,11 @@ const favourtiesHandler = async (req, res, next) => {
             err,
             503))
     }
-
     res.json({ message: 'succesfully added to your favourites' })
 }
+
+
+
 
 
 exports.signup = signup;

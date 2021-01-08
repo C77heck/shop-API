@@ -14,7 +14,7 @@ const Product = require('../models/product');
 
 const getAllProducts = async (req, res, next) => {
     let products;
-
+    console.log('we got a request')
     try {
         products = await Product.find({});
     } catch (err) {
