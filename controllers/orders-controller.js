@@ -92,7 +92,6 @@ const createOrder = async (req, res, next) => {
     } catch (err) {
 
     }
-    console.log(createOrder)
 
     res.status(201).json({ order: createdOrder })
 

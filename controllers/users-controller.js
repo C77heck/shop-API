@@ -83,6 +83,7 @@ const signup = async (req, res, next) => {
         location: coordinates,
         instructions: '',
         orders: [],
+        favourites: [],
         hint,
         answer: answer.trim(),
         status: {
@@ -217,6 +218,7 @@ const signin = async (req, res, next) => {
             userId: existingUser.id,
             email: existingUser.email,
             token: token,
+            favourites: existingUser.favourites
         })
 
 }
@@ -248,8 +250,6 @@ const signout = async (req, res, next) => {
     } catch (err) {
         console.log(err)
     }
-    console.log(user)
-
     res.status(201)
 }
 
@@ -336,11 +336,11 @@ const getUserInfo = async (req, res, next) => {
             500))
     }
 
-    
+
     if (!user.status.isLoggedIn) {
         throw new HttpError('Sorry but something went wrong.', 403)
     }
-    
+
 
     res.json({ userData: user })
 }
@@ -363,6 +363,37 @@ const getUserHint = async (req, res, next) => {
     res.json({ hint: user.hint })
 }
 
+const favourtiesHandler = async (req, res, next) => {
+
+    const userId = req.params.pid;
+    const { productId } = req.body;
+
+    console.log(userId, productId)
+    let user;
+    try {
+        user = await User.findById(userId);
+    } catch (err) {
+        return next(new HttpError(
+            'Something went wrong, could not find user',
+            404))
+    }
+
+    try {
+        if (user.favourites.includes(productId)) {
+            user.favourites.pull(productId);
+        } else {
+            user.favourites.push(productId);
+        }
+        user.save();
+    } catch (err) {
+        return next(new HttpError(
+            err,
+            503))
+    }
+
+    res.json({ message: 'succesfully added to your favourites' })
+}
+
 
 exports.signup = signup;
 exports.signin = signin;
@@ -371,3 +402,4 @@ exports.addDeliveryInstructions = addDeliveryInstructions;
 exports.getUserInfo = getUserInfo;
 exports.getUserHint = getUserHint;
 exports.updateUserData = updateUserData;
+exports.favourtiesHandler = favourtiesHandler;

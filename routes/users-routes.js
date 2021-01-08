@@ -9,6 +9,8 @@ const router = express.Router();
 router.get('/signout/:pid', usersController.signout)
 
 
+
+
 router.post('/signup',
     [
         check('fullName').not().isEmpty(),
@@ -22,10 +24,18 @@ router.post('/signup',
     usersController.signup
 )
 router.post('/signin', usersController.signin)
-router.get('/userinfo/:pid', usersController.getUserInfo)
 router.get('/gethint/:pid', usersController.getUserHint)
 
 router.use(checkAuth);
+
+router.post('/favourites/:pid',
+[
+    check('productId').not().isEmpty()
+],
+usersController.favourtiesHandler)
+
+router.get('/userinfo/:pid', usersController.getUserInfo)
+
 
 router.patch('/updatedata/:pid', [
     check('fullName').not().isEmpty(),
@@ -34,7 +44,6 @@ router.patch('/updatedata/:pid', [
     check('address').not().isEmpty()
 ],
     usersController.updateUserData);
-
 
 
 router.patch('/update/deliveryinstructions',

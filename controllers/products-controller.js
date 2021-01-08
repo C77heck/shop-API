@@ -9,6 +9,9 @@ const productCodeCreator = require('../util/product-code-creator')
 const Product = require('../models/product');
 
 
+
+
+
 const getAllProducts = async (req, res, next) => {
     let products;
 

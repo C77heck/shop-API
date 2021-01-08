@@ -23,10 +23,12 @@ const userSchema = new Schema({
   },
   instructions: { type: String },
   orders: [{ type: mongoose.Types.ObjectId, required: true, ref: 'Order' }],
+  favourites: [{ type: mongoose.Types.ObjectId, required: true, ref: 'Product' }],
   hint: { type: String, required: true },
   answer: { type: String, required: true },
   status: {
     isLoggedIn: { type: Boolean, required: true },
+    loginAttempts: { type: Number, required: true },
     isBlocked: { type: Boolean, required: true },
     dateUntilBlocked: { type: String },
     unblockTimer: { type: Number },
