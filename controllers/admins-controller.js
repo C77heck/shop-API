@@ -1,14 +1,35 @@
-const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcryptjs');
 
-const jwt = require('jsonwebtoken')
 
 const { validationResult } = require('express-validator');
 
+const { notifyingEmailToAdmin } = require('../util/email');
 const HttpError = require('../models/http-error');
 const Admin = require('../models/admin');
 const User = require('../models/user');
 const Order = require('../models/order');
+const Product = require('../models/product');
+
+const getProduct = async (req, res, next) => {
+    const code = req.params.pid;
+
+    let product;
+    try {
+        product = await Product.findOne({ code: code })
+        if (product === null) {
+            throw new HttpError();
+        }
+    } catch (err) {
+        return next(new HttpError(
+            'The product code is not in our database.',
+            404))
+    }
+
+    res.status(201).json({ product: product })
+
+}
+
+
 
 const getOrders = async (req, res, next) => {
     let orders;
@@ -45,87 +66,7 @@ const getUsers = async (req, res, next) => {
 
     res.json({ users: users.map(u => u.toObject({ getters: true })) })
 }
-const adminSignup = async (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        console.log(errors)
-        const error = new HttpError(
-            'Invalid inputs passed, please check your data',
-            422
-        )
-        return next(error)
-    }
 
-    const { fullName, email, password, phone, isAdmin } = req.body;
-
-    let existingAdmin;
-    try {
-        existingAdmin = await Admin.findOne({ email: email })
-    } catch (err) {
-        return next(new HttpError(
-            'This user does not exist in the database',
-            500
-        ))
-    }
-    if (existingAdmin) {
-        return next(new HttpError(
-            'The email you entered, is already in use',
-            500
-        ))
-    }
-
-    let hashedPassword;
-    try {
-        hashedPassword = await bcrypt.hash(password, 12)
-    } catch (err) {
-
-        return next(new HttpError(
-            'Could not create admin, please try again.',
-            500
-        ))
-    }
-
-
-    const createdAdmin = new Admin({
-        fullName,
-        email,
-        password: hashedPassword,
-        phone,
-        isAdmin
-    })
-
-    try {
-
-        createdAdmin.save();
-
-    } catch (err) {
-        const error = new HttpError(' Signing up failed, please try again', 500)
-        return next(error)
-
-    }
-
-    let token;
-    try {
-
-        token = jwt.sign({ userId: createdAdmin.id, email: createdAdmin.email },
-            process.env.JWT_KEY,
-            { expiresIn: '1h' }
-        )
-    } catch (err) {
-
-        return next(new HttpError(' Signing up failed, please try again', 500))
-    }
-
-    res
-        .status(201)
-        .json({
-            userId: createdUser.id,
-            email: createdUser.email,
-            token: token,
-            isAdmin: createdAdmin.isAdmin
-        })
-
-}
 
 const adminSignin = async (req, res, next) => {
 
@@ -135,45 +76,73 @@ const adminSignin = async (req, res, next) => {
         return next(error)
     }
 
-    const { email, password } = req.body;
+    const { accountID, password } = req.body;
     let existingAdmin;
-
+    console.log(accountID, password)
     try {
-        existingAdmin = await Admin.findOne({ email: email })
+        existingAdmin = await Admin.findOne({ accountID: accountID })
     } catch (err) {
-        return next(new HttpError(`Login failed, please try again later.`, 500))
+        return next(new HttpError(`Invalid credentials, please try again.`, 401))
     }
 
     if (!existingAdmin) {
-        return next(new HttpError('Invalid credentials, please try again.', 401))
+        return next(new HttpError(`Invalid credentials, please try again.${existingAdmin}`, 401))
+    }
+
+
+    if (existingAdmin.status.loginAttempts > 2) {
+        try {
+            const requestDate = new Date();
+            const requestExpiry = new Date(new Date().getTime() + 1000 * 60 * 60);
+
+            existingAdmin.status.isBlocked = true;
+            existingAdmin.save();
+
+            notifyingEmailToAdmin(existingAdmin.email, existingAdmin.fullName.firstName)
+
+            throw new HttpError()
+        } catch (err) {
+            return next(new HttpError(
+                'You have entered incorrect password 3 times.'
+                +
+                'This account has been blocked for security reasons.',
+                403
+            ))
+        }
     }
 
     let isValidPassword = false;
 
     try {
-        isValidPassword = await bcrypt.compare(password, existingAdmin.password)
+
+        isValidPassword = password === existingAdmin.password ? true : false;
+        // isValidPassword = await bcrypt.compare(password, existingAdmin.password)
     } catch (err) {
         return next(new HttpError('Could not log you in, please check your credentials and try again', 500))
     }
 
-    let token;
-    try {
-        token = jwt.sign({ userId: existingAdmin.id, email: existingAdmin.email },
-            process.env.JWT_KEY,
-            { expiresIn: '1h' }
-        )
-    } catch (err) {
 
-        return next(new HttpError(' Signing in failed, please try again', 500))
+
+    if (!isValidPassword) {
+
+        existingAdmin.status.loginAttempts += 1;
+        existingAdmin.save();
+        return next(new HttpError(
+            'Could not log you in, please check your credentials and try again',
+            500
+        ))
+    } else {
+        existingAdmin.status.passwordRequest = 0;
+        existingAdmin.status.isLoggedIn = true;
+        existingAdmin.save();
     }
+
 
 
     res
         .json({
             message: 'Succesful login',
             userId: existingAdmin.id,
-            email: existingAdmin.email,
-            token: token,
             isAdmin: existingAdmin.isAdmin
         })
 
@@ -181,6 +150,7 @@ const adminSignin = async (req, res, next) => {
 
 
 exports.getUsers = getUsers;
-exports.adminSignup = adminSignup;
+//exports.adminSignup = adminSignup;
 exports.adminSignin = adminSignin;
 exports.getOrders = getOrders;
+exports.getProduct = getProduct;

@@ -34,7 +34,7 @@ mongoose.set('useCreateIndex', true);
 
 app.use('/api/products', productsRoutes);
 app.use('/api/users', usersRoutes);
-app.use('/api/admin', adminsRoutes);
+app.use('/api/admins', adminsRoutes);
 app.use('/api/orders', ordersRoutes);
 app.use('/api/recovery', recoveryRoutes);
 

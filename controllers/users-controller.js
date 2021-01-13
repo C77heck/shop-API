@@ -116,9 +116,12 @@ const signup = async (req, res, next) => {
     res
         .status(201)
         .json({
-            userLocation: createdUser.location,
-            userId: createdUser.id, email: createdUser.email,
-            token: token
+
+            userData: {
+                userLocation: createdUser.location,
+                userId: createdUser.id,
+                token: token,
+            }
         })
 
 }
@@ -194,7 +197,6 @@ const signin = async (req, res, next) => {
     } else {
         existingUser.status.passwordRequest = 0;
         existingUser.status.isLoggedIn = true;
-
         existingUser.save();
     }
 
@@ -214,11 +216,11 @@ const signin = async (req, res, next) => {
 
     res
         .json({
-            message: 'Succesful login',
-            userId: existingUser.id,
-            email: existingUser.email,
-            token: token,
-            favourites: existingUser.favourites
+            userData: {
+                userId: existingUser.id,
+                token: token,
+                favourites: existingUser.favourites
+            }
         })
 
 }
@@ -228,7 +230,6 @@ const signin = async (req, res, next) => {
 const signout = async (req, res, next) => {
 
     const userId = req.params.pid;
-    console.log(req.params.pid)
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         const error = new HttpError('Invalid inputs passed, please check your data', 422)
@@ -261,7 +262,6 @@ const updateUserData = async (req, res, next) => {
         phone,
         address,
         instructions,
-        hint,
         answer
     } = req.body;
 
@@ -282,27 +282,38 @@ const updateUserData = async (req, res, next) => {
         return next(error)
     }
 
+    try {
+        if (user.answer !== answer) {
+            throw new HttpError()
+        }
+    } catch (err) {
+        return next(new HttpError('Incorrect answer!', 401))
+    }
+
 
     if (user !== null) {
         try {
+
             user.fullName = fullName;
             user.email = email;
             user.phone = phone;
             user.address = address;
             user.location = coordinates;
             user.instructions = instructions;
-            user.hint = hint;
-            user.answer = answer
             await user.save();
         } catch (err) {
-            return next(new HttpError(err, 500))
+            return next(
+                new HttpError(
+                    'Something went wrong, please try again later.',
+                    500
+                ))
 
         }
     } else {
         console.log(`user was not found by the user id of ${userId}`)
     }
 
-    res.status(201).json({ userData: user })
+    res.status(201).json({ message: 'User info has been updated!' })
 }
 
 const addDeliveryInstructions = async (req, res, next) => {
@@ -341,7 +352,7 @@ const getUserInfo = async (req, res, next) => {
         throw new HttpError('Sorry but something went wrong.', 403)
     }
 
-    res.json({ userData: user.address })
+    res.json({ userData: user })
 }
 
 const getUserHint = async (req, res, next) => {

@@ -59,6 +59,28 @@ const orderConfirmation = (email, name, date) => {
     });
 }
 
+const notifyingEmailToAdmin = (email, name) => {
+    const mailOptions = {
+        from: 'NOREPLY-FURUMA@furuma.ltd.com',
+        to: `${email}`,
+        subject: 'Account blocked',
+        html: `<h3>Dear ${name},</h3>
+        <p>Your account has been blocked due to multiple attempts with incorrect password.</p>
+        <p>Please contact custumer service to unblock your account.</p>
+        <p>Sincerely,</p>
+        <p>Furuma team</p>`
+    };
+
+    transporter.sendMail(mailOptions, function (error) {
+        if (error) {
+            console.log(error);
+        } else {
+            console.log('Email sent');
+        }
+    });
+}
+
+
 exports.recoveryMessage = recoveryMessage;
 exports.orderConfirmation = orderConfirmation;
-
+exports.notifyingEmailToAdmin = notifyingEmailToAdmin;

@@ -1,5 +1,4 @@
 const multer = require('multer');
-/* this package is to manage images */
 const { v4: uuidv4 } = require('uuid');
 
 
@@ -29,9 +28,7 @@ const MIME_TYPE_MAP = {
     }),
     fileFilter: (req, file, callBack) => {
         const isValid = !!MIME_TYPE_MAP[file.mimetype];
-        /* this will check if the returned extension is valid based on our criteria
-        notice the double !! which takes the object and with the file.mimetype will check
-        if the file valid or not. so it return truthy or falsey. pretty neat */
+
         let error = isValid ? null : new Error('Invalid mime type!');
         callBack(error, isValid);
     }

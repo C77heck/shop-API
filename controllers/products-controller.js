@@ -14,7 +14,6 @@ const Product = require('../models/product');
 
 const getAllProducts = async (req, res, next) => {
     let products;
-    console.log('we got a request')
     try {
         products = await Product.find({});
     } catch (err) {
@@ -76,7 +75,6 @@ const createProduct = async (req, res, next) => {
     }
 
     const errors = validationResult(req)
-    console.log(errors)
     if (!errors.isEmpty()) {
         return next(new HttpError('Invalid inputs passed, please check your data', 422))
     }
@@ -95,8 +93,8 @@ const createProduct = async (req, res, next) => {
     } catch (err) {
         return next(new HttpError('Creating product failed, please try again.', 500))
     }
-
-    res.status(201).json({ product: createdProduct })
+    console.log(createdProduct)
+    res.status(201).json({ message: 'Product has been added.' })
 
 }
 
@@ -110,24 +108,44 @@ const updateProduct = async (req, res, next) => {
     if (!errors.isEmpty()) {
         return next(new HttpError('Invalid inputs passed, please check your data', 422))
     }
-
+    const code = req.params.pid;
     const { name, unit, price } = req.body;
-    const productId = req.params.pid;
 
+    const file = req.file || false;
+    console.log(file)
     try {
-
-        await Product.replaceOne({ code: productId }, {
-            name: name,
-            unit: unit,
-            price: price,
-            code: productId,
-            image: req.file.path
+        await Product.replaceOne({ code: code }, {
+            name: name || this.name,
+            unit: unit || this.unit,
+            price: price || this.price,
+            code: code || this.code,
+            image: !file ? this.image : req.file.path
         })
     } catch (err) {
-        return next(new HttpError('Something went wrong, could not update product', 500))
+        return next(new HttpError(
+            'Something went wrong, could not update product',
+            503
+        ))
     }
 
-    res.status(200).json({ message: `successfully updated` })
+
+
+    let product;
+    try {
+
+        product = await Product.findOne({ code: code })
+    } catch (err) {
+        return next(new HttpError(
+            'Something went wrong, could not update product',
+            503
+        ))
+    }
+
+    console.log(product)
+
+
+    console.log(product)
+    res.status(200).json({ message: `successfully updated.` })
 }
 
 
@@ -137,13 +155,12 @@ const updateProduct = async (req, res, next) => {
 const deleteProduct = async (req, res, next) => {
     const productId = req.params.pid;
     try {
-
         await Product.deleteOne({ code: productId });
     } catch (err) {
         return next(new HttpError('Could not delete product, please try again.', 500))
     }
 
-    res.json({ message: 'success' })
+    res.json({ message: 'Product has been deleted.' })
 }
 
 exports.getAllProducts = getAllProducts;

@@ -24,6 +24,7 @@ router.post('/',
     productsControllers.createProduct)
 
 router.patch('/:pid',
+    fileUpload.single('image'),
     [
         check('name').not().isEmpty(),
         check('unit').not().isEmpty(),
