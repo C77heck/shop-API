@@ -1,4 +1,4 @@
-const { v4: uuidv4 } = require('uuid');
+/* const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcryptjs');
 
 const jwt = require('jsonwebtoken')
@@ -413,3 +413,4 @@ exports.getUserInfo = getUserInfo;
 exports.getUserHint = getUserHint;
 exports.updateUserData = updateUserData;
 exports.favourtiesHandler = favourtiesHandler;
+ */

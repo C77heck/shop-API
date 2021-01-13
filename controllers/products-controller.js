@@ -1,4 +1,4 @@
-
+/* 
 const fs = require('fs');
 
 const HttpError = require('../models/http-error');
@@ -168,4 +168,4 @@ exports.getProductByCode = getProductByCode;
 exports.getProductByName = getProductByName;
 exports.updateProduct = updateProduct;
 exports.createProduct = createProduct;
-exports.deleteProduct = deleteProduct;
+exports.deleteProduct = deleteProduct; */
