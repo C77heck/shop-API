@@ -63,7 +63,7 @@ mongoose
     .connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@ch77ecked.eih2z.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`,
         { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
-        app.listen(2000 || process.env.PORT, () => console.log('its running'));
+        app.listen(process.env.PORT || 2000, () => console.log('its running'));
     })
     .catch(err => {
         console.log(err)
