@@ -293,7 +293,6 @@ const updateUserData = async (req, res, next) => {
 
     if (user !== null) {
         try {
-
             user.fullName = fullName;
             user.email = email;
             user.phone = phone;
