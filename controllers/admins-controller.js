@@ -1,4 +1,4 @@
-/* const bcrypt = require('bcryptjs');
+ const bcrypt = require('bcryptjs');
 
 
 const { validationResult } = require('express-validator');
@@ -153,4 +153,4 @@ exports.getUsers = getUsers;
 //exports.adminSignup = adminSignup;
 exports.adminSignin = adminSignin;
 exports.getOrders = getOrders;
-exports.getProduct = getProduct; */
+exports.getProduct = getProduct; 

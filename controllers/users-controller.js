@@ -1,4 +1,4 @@
-/* const { v4: uuidv4 } = require('uuid');
+const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcryptjs');
 
 const jwt = require('jsonwebtoken')
@@ -213,15 +213,16 @@ const signin = async (req, res, next) => {
         return next(new HttpError(' Signing in failed, please try again', 500))
     }
 
+    res.json({
+        userData: {
+            userId: existingUser.id,
+            token: token,
+            favourites: existingUser.favourites
+        }
+    })
 
-    res
-        .json({
-            userData: {
-                userId: existingUser.id,
-                token: token,
-                favourites: existingUser.favourites
-            }
-        })
+
+
 
 }
 
@@ -413,4 +414,3 @@ exports.getUserInfo = getUserInfo;
 exports.getUserHint = getUserHint;
 exports.updateUserData = updateUserData;
 exports.favourtiesHandler = favourtiesHandler;
- */

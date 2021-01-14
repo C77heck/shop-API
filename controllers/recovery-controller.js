@@ -1,4 +1,4 @@
-/* const { v4: uuidv4 } = require('uuid');
+ const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcryptjs');
 
 const { recoveryMessage } = require('../util/email');
@@ -383,4 +383,4 @@ exports.notMe = notMe;
 exports.getHint = getHint;
 exports.passwordRecovery = passwordRecovery;
 exports.PasswordReset = PasswordReset;
-exports.userPasswordResetting = userPasswordResetting; */
+exports.userPasswordResetting = userPasswordResetting; 
