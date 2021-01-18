@@ -93,7 +93,6 @@ const createProduct = async (req, res, next) => {
     } catch (err) {
         return next(new HttpError('Creating product failed, please try again.', 500))
     }
-    console.log(createdProduct)
     res.status(201).json({ message: 'Product has been added.' })
 
 }
@@ -112,7 +111,6 @@ const updateProduct = async (req, res, next) => {
     const { name, unit, price } = req.body;
 
     const file = req.file || false;
-    console.log(file)
     try {
         await Product.replaceOne({ code: code }, {
             name: name || this.name,
@@ -141,10 +139,7 @@ const updateProduct = async (req, res, next) => {
         ))
     }
 
-    console.log(product)
 
-
-    console.log(product)
     res.status(200).json({ message: `successfully updated.` })
 }
 

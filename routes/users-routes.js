@@ -23,16 +23,24 @@ router.post('/signup',
     ],
     usersController.signup
 )
+router.post('/contact',
+    [
+        check('name').not().isEmpty(),
+        check('email').normalizeEmail().isEmail(),
+        check('message').not().isEmpty()
+    ],
+    usersController.contact)
+
 router.post('/signin', usersController.signin)
 router.get('/gethint/:pid', usersController.getUserHint)
 
 router.use(checkAuth);
 
 router.post('/favourites/:pid',
-[
-    check('productId').not().isEmpty()
-],
-usersController.favourtiesHandler)
+    [
+        check('productId').not().isEmpty()
+    ],
+    usersController.favourtiesHandler)
 
 router.get('/userinfo/:pid', usersController.getUserInfo)
 

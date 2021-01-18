@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const { contact } = require('../controllers/users-controller');
 
 
 
@@ -80,7 +81,24 @@ const notifyingEmailToAdmin = (email, name) => {
     });
 }
 
+const contactEmail = (name, email, message) => {
+    const mailOptions = {
+        from: `${email}`,
+        to: `zcsilleri@gmail.com`,
+        subject: `${name} "contact us"`,
+        html: `<p>${message}</p>`
+    };
 
+    transporter.sendMail(mailOptions, function (error) {
+        if (error) {
+            console.log(error);
+        } else {
+            console.log('Email sent');
+        }
+    });
+}
+
+exports.contactEmail = contactEmail;
 exports.recoveryMessage = recoveryMessage;
 exports.orderConfirmation = orderConfirmation;
 exports.notifyingEmailToAdmin = notifyingEmailToAdmin;

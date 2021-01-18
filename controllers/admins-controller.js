@@ -78,7 +78,6 @@ const adminSignin = async (req, res, next) => {
 
     const { accountID, password } = req.body;
     let existingAdmin;
-    console.log(accountID, password)
     try {
         existingAdmin = await Admin.findOne({ accountID: accountID })
     } catch (err) {

@@ -7,11 +7,12 @@ const { validationResult } = require('express-validator');
 
 const getCoordsForAddress = require('../util/location');
 
-const { recoveryMessage } = require('../util/email');
+const { recoveryMessage, contactEmail } = require('../util/email');
 
 const HttpError = require('../models/http-error');
 const User = require('../models/user');
 const Recovery = require('../models/recovery');
+
 
 
 
@@ -402,7 +403,20 @@ const favourtiesHandler = async (req, res, next) => {
     res.json({ message: 'succesfully added to your favourites' })
 }
 
+const contact = (req, res, next) => {
+    const { name, email, message } = req.body;
 
+    try {
+        contactEmail(name, email, message)
+    } catch (err) {
+        return next(new HttpError(
+            'Sorry something went wrong, please try again later'
+            , 503
+        ))
+    }
+    res.json({ message: 'Thank you for getting touch. we will respond as soon as we can.' })
+
+}
 
 
 
@@ -414,3 +428,4 @@ exports.getUserInfo = getUserInfo;
 exports.getUserHint = getUserHint;
 exports.updateUserData = updateUserData;
 exports.favourtiesHandler = favourtiesHandler;
+exports.contact = contact;
