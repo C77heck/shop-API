@@ -7,6 +7,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
+const compression = require('compression')
 
 const HttpError = require('./models/http-error')
 
@@ -20,6 +21,10 @@ const recoveryRoutes = require('./routes/recovery-routes');
 const app = express();
 app.use(bodyParser.json())
 
+app.use(compression({
+    level: 6,
+    threshold: 5*1000,
+}))
 
 app.use('/uploads/images', express.static(path.join('uploads', 'images')));
 
