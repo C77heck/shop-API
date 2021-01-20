@@ -419,7 +419,6 @@ const contact = (req, res, next) => {
 }
 
 
-
 exports.signup = signup;
 exports.signin = signin;
 exports.signout = signout;

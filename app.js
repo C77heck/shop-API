@@ -11,6 +11,7 @@ const compression = require('compression')
 
 const HttpError = require('./models/http-error')
 
+const resourceRoutes = require('./routes/resource-routes')
 const productsRoutes = require('./routes/products-routes');
 const usersRoutes = require('./routes/users-routes');
 const adminsRoutes = require('./routes/admins-routes');
@@ -23,7 +24,7 @@ app.use(bodyParser.json())
 
 app.use(compression({
     level: 6,
-    threshold: 5*1000,
+    threshold: 5 * 1000,
 }))
 
 app.use('/uploads/images', express.static(path.join('uploads', 'images')));
@@ -36,7 +37,7 @@ app.use((req, res, next) => {
 })
 mongoose.set('useCreateIndex', true);
 
-
+app.use('/api/resources', resourceRoutes)
 app.use('/api/products', productsRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/admins', adminsRoutes);

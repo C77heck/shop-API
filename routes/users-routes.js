@@ -6,9 +6,11 @@ const usersController = require('../controllers/users-controller')
 
 const router = express.Router();
 
+
+
+
+
 router.get('/signout/:pid', usersController.signout)
-
-
 
 
 router.post('/signup',
