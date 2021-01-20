@@ -14,7 +14,7 @@ router.get('/numbers/:pid', productsControllers.getProductByCode)
 router.get('/letters/:pid', productsControllers.getProductByName)
 
 
-router.post('/',
+router.post('/:pid',
     fileUpload.single('image'),
     [
         check('name').not().isEmpty(),
@@ -32,7 +32,9 @@ router.patch('/:pid',
     ],
     productsControllers.updateProduct)
 
-router.delete('/:pid', productsControllers.deleteProduct)
+router.delete('/:pid', [
+    check('code').not().isEmpty()
+], productsControllers.deleteProduct)
 
 
 module.exports = router;

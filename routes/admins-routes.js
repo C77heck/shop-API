@@ -8,8 +8,8 @@ const router = express.Router();
 
 router.get('/bycode/:pid', adminsController.getProduct)
 
-router.get('/orders', adminsController.getOrders)
-
+/* router.get('/orders', adminsController.getOrders)
+ */
 
 
 router.post('/adminsignin', adminsController.adminSignin)

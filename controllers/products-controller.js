@@ -7,7 +7,7 @@ const { validationResult } = require('express-validator');
 const productCodeCreator = require('../util/product-code-creator')
 
 const Product = require('../models/product');
-
+const Admin = require('../models/admin');
 
 
 
@@ -28,11 +28,8 @@ const getAllProducts = async (req, res, next) => {
 const getProductByCode = async (req, res, next) => {
     const productId = req.params.pid;
     let products;
-
     try {
         products = await Product.find({ code: productId })
-        //see if it works. otherwise look into angela's or something.
-
     } catch (err) {
         return next(new HttpError('Something went wrong, could not find product', 500))
     }
@@ -47,7 +44,6 @@ const getProductByName = async (req, res, next) => {
     let products;
     try {
         products = await Product.find({ name: { $regex: name, $options: 'i' } })
-        //see if it works. otherwise look into angela's or something.
 
     } catch (err) {
         return next(new HttpError('Something went wrong, could not find product', 500))
@@ -62,6 +58,15 @@ const getProductByName = async (req, res, next) => {
 
 const createProduct = async (req, res, next) => {
     const { name, unit, price } = req.body;
+    const adminId = req.params.pid;
+
+    let admin;
+    try {
+        admin = await Admin.findById(adminId);
+    } catch (err) {
+        return next(new HttpError('Authentication failed!', 503))
+    }
+
     let code;
     try {
         code = productCodeCreator();
@@ -107,8 +112,18 @@ const updateProduct = async (req, res, next) => {
     if (!errors.isEmpty()) {
         return next(new HttpError('Invalid inputs passed, please check your data', 422))
     }
-    const code = req.params.pid;
-    const { name, unit, price } = req.body;
+    const { name, unit, price, code } = req.body;
+
+    const adminId = req.params.pid;
+
+    let admin;
+    try {
+        admin = await Admin.findById(adminId);
+    } catch (err) {
+        return next(new HttpError('Authentication failed!', 503))
+    }
+
+
 
     const file = req.file || false;
     try {
@@ -148,9 +163,18 @@ const updateProduct = async (req, res, next) => {
 
 
 const deleteProduct = async (req, res, next) => {
-    const productId = req.params.pid;
+    const { code } = req.body;
+    const adminId = req.params.pid;
+
+    let admin;
     try {
-        await Product.deleteOne({ code: productId });
+        admin = await Admin.findById(adminId);
+    } catch (err) {
+        return next(new HttpError('Authentication failed!', 503))
+    }
+
+    try {
+        await Product.deleteOne({ code: code });
     } catch (err) {
         return next(new HttpError('Could not delete product, please try again.', 500))
     }

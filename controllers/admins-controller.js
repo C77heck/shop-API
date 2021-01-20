@@ -1,4 +1,4 @@
- const bcrypt = require('bcryptjs');
+const bcrypt = require('bcryptjs');
 
 
 const { validationResult } = require('express-validator');
@@ -12,7 +12,6 @@ const Product = require('../models/product');
 
 const getProduct = async (req, res, next) => {
     const code = req.params.pid;
-
     let product;
     try {
         product = await Product.findOne({ code: code })
@@ -21,7 +20,7 @@ const getProduct = async (req, res, next) => {
         }
     } catch (err) {
         return next(new HttpError(
-            'The product code is not in our database.',
+            `The product code is not in our database.`,
             404))
     }
 
@@ -57,6 +56,7 @@ const getOrders = async (req, res, next) => {
 
 const getUsers = async (req, res, next) => {
     const { email, name } = req.body;
+    
     let users;
     try {
         users = await User.find({}, '-password')
