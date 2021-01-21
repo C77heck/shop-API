@@ -18,7 +18,8 @@ router.post('/:pid',
         check('unit').not().isEmpty(),
         check('price').not().isEmpty()
     ],
-    productsControllers.createProduct)
+    productsControllers.createProduct
+);
 
 router.patch('/:pid',
     fileUpload.single('image'),
@@ -27,11 +28,13 @@ router.patch('/:pid',
         check('unit').not().isEmpty(),
         check('price').not().isEmpty()
     ],
-    productsControllers.updateProduct)
+    productsControllers.updateProduct
+);
 
 router.delete('/:pid', [
     check('code').not().isEmpty()
-], productsControllers.deleteProduct)
+], productsControllers.deleteProduct
+);
 
 
 module.exports = router;

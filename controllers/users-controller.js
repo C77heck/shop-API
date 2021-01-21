@@ -37,14 +37,14 @@ const signup = async (req, res, next) => {
         existingUser = await User.findOne({ email: email })
     } catch (err) {
         return next(new HttpError(
-            'This user does not exist in the database',
-            500
+            'This user does not exist in our database',
+            503
         ))
     }
     if (existingUser) {
         return next(new HttpError(
             'The email you entered, is already in use',
-            500
+            400
         ))
     }
 
@@ -98,8 +98,11 @@ const signup = async (req, res, next) => {
     try {
         createdUser.save();
     } catch (err) {
-        const error = new HttpError(' Signing up failed, please try again', 500)
-        return next(error)
+
+        return next(new HttpError(
+            'Signing up failed, please try again',
+            500
+        ))
     }
 
     let token;
@@ -111,7 +114,10 @@ const signup = async (req, res, next) => {
         )
     } catch (err) {
 
-        return next(new HttpError(' Signing up failed, please try again', 500))
+        return next(new HttpError(
+            ' Signing up failed, please try again',
+            500
+        ))
     }
 
     res
@@ -133,8 +139,10 @@ const signin = async (req, res, next) => {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        const error = new HttpError('Invalid inputs passed, please check your data', 422)
-        return next(error)
+        return next(new HttpError(
+            'Invalid inputs passed, please check your data',
+            503
+        ))
     }
 
     const { email, password } = req.body;
@@ -144,11 +152,17 @@ const signin = async (req, res, next) => {
     try {
         existingUser = await User.findOne({ email: email })
     } catch (err) {
-        return next(new HttpError(`Login failed, please try again later.`, 500))
+        return next(new HttpError(
+            `Login failed, please try again later.`,
+            500
+        ))
     }
 
     if (!existingUser) {
-        return next(new HttpError('Invalid credentials, please try again.', 401))
+        return next(new HttpError(
+            'Invalid credentials, please try again.',
+            401
+        ))
     }
     if (existingUser.status.loginAttempts > 4) {
         try {
@@ -172,7 +186,7 @@ const signin = async (req, res, next) => {
                 'You have entered incorrect password 5 times.'
                 +
                 ' we have sent a password recovery link to your email address.',
-                500
+                401
             ))
         }
     }
@@ -183,7 +197,7 @@ const signin = async (req, res, next) => {
     } catch (err) {
         return next(new HttpError(
             'Could not log you in, please check your credentials and try again',
-            500
+            401
         ))
     }
 
@@ -193,7 +207,7 @@ const signin = async (req, res, next) => {
         existingUser.save();
         return next(new HttpError(
             'Could not log you in, please check your credentials and try again',
-            500
+            401
         ))
     } else {
         existingUser.status.passwordRequest = 0;
@@ -211,7 +225,10 @@ const signin = async (req, res, next) => {
         )
     } catch (err) {
 
-        return next(new HttpError(' Signing in failed, please try again', 500))
+        return next(new HttpError(
+            ' Signing in failed, please try again',
+            500
+        ))
     }
 
     res.json({
@@ -234,8 +251,10 @@ const signout = async (req, res, next) => {
     const userId = req.params.pid;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        const error = new HttpError('Invalid inputs passed, please check your data', 422)
-        return next(error)
+        return next(new HttpError(
+            'Invalid inputs passed, please check your data',
+            422
+        ))
     }
 
     let user;
@@ -271,7 +290,10 @@ const updateUserData = async (req, res, next) => {
     try {
         user = await User.findById(userId)
     } catch (err) {
-        return next(new HttpError(err, 500))
+        return next(new HttpError(
+            'Something went wrong on our side. Please try again later',
+            500
+        ))
     }
 
 
@@ -324,13 +346,19 @@ const addDeliveryInstructions = async (req, res, next) => {
     try {
         user = await User.findById(userId)
     } catch (err) {
-        return next(new HttpError('something is wrong', 500))
+        return next(new HttpError(
+            'Something went wrong on our side. Please try again later',
+            500
+        ))
     }
     try {
         user.instructions = instructions;
         await user.save();
     } catch (err) {
-        return next(new HttpError('what is going on', 500))
+        return next(new HttpError(
+            'Something went wrong on our side. Please try again later',
+            500
+        ))
     }
 
     res.json({ instructions: instructions })
@@ -348,10 +376,18 @@ const getUserInfo = async (req, res, next) => {
             500))
     }
 
+    try {
+        if (!user.status.isLoggedIn) {
+            throw new HttpError(
+                'Sorry but something went wrong.',
+                403
+            )
+        }
+    } catch (err) {
 
-    if (!user.status.isLoggedIn) {
-        throw new HttpError('Sorry but something went wrong.', 403)
+        return next(new HttpError(err))
     }
+
 
     res.json({ userData: user })
 }
@@ -364,17 +400,26 @@ const getUserHint = async (req, res, next) => {
     } catch (err) {
         return next(new HttpError(
             'Something went wrong, could not find user',
-            500))
+            500
+        ))
+    }
+    try {
+        if (!user.status.isLoggedIn) {
+            throw new HttpError(
+                'Sorry but something went wrong.',
+                403)
+        }
+    } catch (err) {
+
+        return next(new HttpError(err))
+
     }
 
-    if (!user.status.isLoggedIn) {
-        throw new HttpError('Sorry but something went wrong.', 403)
-    }
 
     res.json({ hint: user.hint })
 }
 
-const favourtiesHandler = async (req, res, next) => {
+const favouritesHandler = async (req, res, next) => {
 
     const userId = req.params.pid;
     const { productId } = req.body;
@@ -397,8 +442,9 @@ const favourtiesHandler = async (req, res, next) => {
         user.save();
     } catch (err) {
         return next(new HttpError(
-            err,
-            503))
+            'Something went wrong on our side. Please try again later',
+            500
+        ))
     }
     res.json({ message: 'succesfully added to your favourites' })
 }
@@ -426,5 +472,5 @@ exports.addDeliveryInstructions = addDeliveryInstructions;
 exports.getUserInfo = getUserInfo;
 exports.getUserHint = getUserHint;
 exports.updateUserData = updateUserData;
-exports.favourtiesHandler = favourtiesHandler;
+exports.favouritesHandler = favouritesHandler;
 exports.contact = contact;

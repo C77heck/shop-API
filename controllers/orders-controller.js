@@ -47,7 +47,7 @@ const createOrder = async (req, res, next) => {
         //   console.log(errors)
         return next(new HttpError(
             'Sorry but something went wrong and could not process your order',
-            422
+            500
         ))
     }
 
@@ -66,7 +66,7 @@ const createOrder = async (req, res, next) => {
     } catch (err) {
         return next(new HttpError(
             'Could not find user for provided id',
-            500
+            404
         ))
     }
 
@@ -79,8 +79,8 @@ const createOrder = async (req, res, next) => {
         session.commitTransaction();
     } catch (err) {
         return next(new HttpError(
-            err,
-            422
+            'Sorry something went wrong on our side. Please try again later.',
+            500
         ))
 
     }

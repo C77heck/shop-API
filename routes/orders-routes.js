@@ -11,9 +11,9 @@ router.get('/:pid',
         check('objectId').not().isEmpty()
     ],
     ordersController.getOrders
-)
+);
 
-router.use(checkAuth)
+router.use(checkAuth);//jwt token middleware
 
 router.post('/',
     [
@@ -25,7 +25,7 @@ router.post('/',
         check('creator').not().isEmpty()
     ],
     ordersController.createOrder
-)
+);
 
 
 module.exports = router;

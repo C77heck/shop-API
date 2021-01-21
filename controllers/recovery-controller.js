@@ -1,4 +1,4 @@
- const { v4: uuidv4 } = require('uuid');
+const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcryptjs');
 
 const { recoveryMessage } = require('../util/email');
@@ -29,8 +29,8 @@ const notMe = async (req, res, next) => {
 
     } catch (err) {
         return next(new HttpError(
-            err,
-            404
+            'Something went wrong on our side. Please try again later',
+            500
         ))
     }
 
@@ -41,7 +41,7 @@ const notMe = async (req, res, next) => {
         user.save();
     } catch (err) {
         return next(new HttpError(
-            err,
+            'Something went wrong on our side. Please try again later',
             500
         ))
     }
@@ -89,9 +89,9 @@ const userPasswordResetting = async (req, res, next) => {
         }
     } catch (err) {
         return next(new HttpError(
-            'Sorry something went wrong, please try again later.'
-            , 401)
-        )
+            'Sorry something went wrong.'
+            , 401
+        ))
     }
 
 
@@ -109,7 +109,7 @@ const userPasswordResetting = async (req, res, next) => {
     } catch (err) {
         return next(new HttpError(
             'Could not log you in, please check your credentials and try again',
-            500
+            503
         ))
     }
 
@@ -130,7 +130,7 @@ const userPasswordResetting = async (req, res, next) => {
         isPasswordSame = await bcrypt.compare(newPassword, user.password)
     } catch (err) {
         return next(new HttpError(
-            'Sorry something went wrong, please try again later.5435'
+            'Sorry something went wrong, please try again later.'
             , 500
         ))
     }
@@ -187,7 +187,8 @@ const passwordRecovery = async (req, res, next) => {
     } catch (err) {
         return next(new HttpError(
             'You are logged in another device, please log out to continue.',
-            403))
+            403
+        ))
     }
 
 
@@ -220,9 +221,8 @@ const passwordRecovery = async (req, res, next) => {
             'Sorry but this account has been blocked for security reasons'
             +
             ` until ${user.status.dateUntilBlocked}`,
-            504
-        )
-        )
+            503
+        ))
     }
 
     let existingRequest;
@@ -258,8 +258,8 @@ const passwordRecovery = async (req, res, next) => {
     } catch (err) {
         return next(new HttpError(
             'Something went wrong, please try again later.',
-            500)
-        )
+            500
+        ))
     }
 
     res.status(201).json({ message: 'Please check your email inbox.' });
@@ -271,6 +271,8 @@ const PasswordReset = async (req, res, next) => {
 
     const requestId = req.params.pid;
 
+
+    //we grab the recovery request from the database
     let request;
     try {
         request = await Recovery.findOne({ requestId: requestId })
@@ -281,13 +283,18 @@ const PasswordReset = async (req, res, next) => {
         ))
     }
 
+    //we then use the request data to find the user
     let user;
     try {
         user = await User.findById(request.creator)
     } catch (err) {
-        return next(new HttpError('whaat?', 500))
+        return next(new HttpError(
+            'Something went wrong on our side. Please try again later',
+            500
+        ))
     }
 
+    //if the user is loggin in another device we throw and error
     try {
         if (user.status.isLoggedIn) {
             throw new HttpError()
@@ -295,24 +302,26 @@ const PasswordReset = async (req, res, next) => {
     } catch (err) {
         return next(new HttpError(
             'You are logged in another device, please log out to continue.',
-            403))
+            403
+        ))
     }
 
-
+    //is the new password same as the new one?
     let isPasswordSame = false;
 
     try {
         isPasswordSame = await bcrypt.compare(password, user.password)
-
+        console.log(isPasswordSame)
     } catch (err) {
         return next(new HttpError(
-            'Could not log you in, please check your credentials and try again',
+            'Sorry but something went wrong. Please try again.',
             500
         ))
     }
 
 
-
+    /* the user has 5 attempts to answer the security 
+    question right if not we block the acc for 24h*/
     if (request.numberOfAttempts > 4) {
 
         user.status.isBlocked = true;
@@ -323,10 +332,10 @@ const PasswordReset = async (req, res, next) => {
             'Security measures failed multiple times'
             +
             ' in a row. this account has been blocked for 24 hours.',
-            500
+            503
         ))
     }
-
+    //we hash the password
     let hashedPassword;
     try {
         hashedPassword = await bcrypt.hash(password, 12)
@@ -339,7 +348,7 @@ const PasswordReset = async (req, res, next) => {
     }
 
 
-
+    //we double check if the password is not the same
     try {
         if (!isPasswordSame) {
             if (user.answer === answer) {
@@ -351,14 +360,12 @@ const PasswordReset = async (req, res, next) => {
                 request.save();
                 throw new HttpError(
                     'The answer you gave does not match the one in our database'
-                    );
+                );
             }
         } else {
-            request.numberOfAttempts += 1;
-            request.save();
             throw new HttpError(
                 'The new password cannot match the old one.'
-                );
+            );
         }
     } catch (err) {
         return next(new HttpError(
@@ -368,15 +375,18 @@ const PasswordReset = async (req, res, next) => {
 
     }
 
-
+//we delete all recovery request this user has made.
     try {
         await Recovery.deleteMany({ creator: user._id })
     } catch (err) {
-        console.log('did not work...')
+        return next(new HttpError(
+            err,
+            500
+        ))
     }
 
 
-    res.status(201).json({ response: 'it got done' });
+    res.status(201).json({ message: 'The password has been changed' });
 }
 
 exports.notMe = notMe;

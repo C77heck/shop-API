@@ -6,13 +6,17 @@ const adminsController = require('../controllers/admins-controller');
 const router = express.Router();
 
 
-router.get('/bycode/:pid', adminsController.getProduct)
 
-/* router.get('/orders', adminsController.getOrders)
- */
+router.get('/bycode/:pid', adminsController.getProduct)//product fetch for update
 
 
-router.post('/adminsignin', adminsController.adminSignin)
+
+router.post('/adminsignin',
+    [
+        check('accountID').not().isEmpty(),
+        check('password').not().isEmpty()
+
+    ], adminsController.adminSignin);
 
 
 

@@ -24,17 +24,20 @@ router.post('/signup',
         check('answer').isLength({ min: 4 })
     ],
     usersController.signup
-)
+);
+
 router.post('/contact',
     [
         check('name').not().isEmpty(),
         check('email').normalizeEmail().isEmail(),
         check('message').not().isEmpty()
     ],
-    usersController.contact)
+    usersController.contact
+);
 
-router.post('/signin', usersController.signin)
-router.get('/gethint/:pid', usersController.getUserHint)
+
+router.post('/signin', usersController.signin);
+router.get('/gethint/:pid', usersController.getUserHint);
 
 router.use(checkAuth);
 
@@ -42,7 +45,8 @@ router.post('/favourites/:pid',
     [
         check('productId').not().isEmpty()
     ],
-    usersController.favourtiesHandler)
+    usersController.favouritesHandler
+);
 
 router.get('/userinfo/:pid', usersController.getUserInfo)
 
@@ -53,15 +57,13 @@ router.patch('/updatedata/:pid', [
     check('phone').not().isEmpty(),
     check('address').not().isEmpty()
 ],
-    usersController.updateUserData);
+    usersController.updateUserData
+);
 
 
 router.patch('/update/deliveryinstructions',
     usersController.addDeliveryInstructions
-)
-
-
-
+);
 
 
 

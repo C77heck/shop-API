@@ -36,8 +36,8 @@ const getOrders = async (req, res, next) => {
         orders = await Order.find();
     } catch (err) {
         return next(new HttpError(
-            err,
-            422
+            'Something went wrong.',
+            500
         ))
     }
     let user;
@@ -72,8 +72,10 @@ const adminSignin = async (req, res, next) => {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        const error = new HttpError('Invalid inputs passed, please check your data', 422)
-        return next(error)
+        return next(new HttpError(
+            'Invalid inputs passed, please check your data',
+             400
+             ))
     }
 
     const { accountID, password } = req.body;
@@ -81,7 +83,10 @@ const adminSignin = async (req, res, next) => {
     try {
         existingAdmin = await Admin.findOne({ accountID: accountID })
     } catch (err) {
-        return next(new HttpError(`Invalid credentials, please try again.`, 401))
+        return next(new HttpError(
+            `Invalid credentials, please try again.`,
+             401
+             ))
     }
 
     if (!existingAdmin) {
@@ -117,7 +122,10 @@ const adminSignin = async (req, res, next) => {
         isValidPassword = password === existingAdmin.password ? true : false;
         // isValidPassword = await bcrypt.compare(password, existingAdmin.password)
     } catch (err) {
-        return next(new HttpError('Could not log you in, please check your credentials and try again', 500))
+        return next(new HttpError(
+            'Could not log you in, please check your credentials and try again',
+             401
+             ))
     }
 
 
@@ -128,7 +136,7 @@ const adminSignin = async (req, res, next) => {
         existingAdmin.save();
         return next(new HttpError(
             'Could not log you in, please check your credentials and try again',
-            500
+            401
         ))
     } else {
         existingAdmin.status.passwordRequest = 0;

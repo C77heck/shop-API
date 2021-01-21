@@ -1,7 +1,4 @@
 const nodemailer = require('nodemailer');
-const { contact } = require('../controllers/users-controller');
-
-
 
 
 const transporter = nodemailer.createTransport({
@@ -11,6 +8,7 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASSWORD
     }
 });
+
 const recoveryMessage = (email, requestId, name) => {
     const mailOptions = {
         from: 'NOREPLY-FURUMA@furuma.ltd.com',

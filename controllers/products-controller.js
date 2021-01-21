@@ -1,10 +1,8 @@
-
-const fs = require('fs');
-
-const HttpError = require('../models/http-error');
 const { validationResult } = require('express-validator');
 
-const productCodeCreator = require('../util/product-code-creator')
+const HttpError = require('../models/http-error');
+
+const productCodeCreator = require('../util/product-code-creator');
 
 const Product = require('../models/product');
 const Admin = require('../models/admin');
@@ -17,10 +15,13 @@ const getAllProducts = async (req, res, next) => {
     try {
         products = await Product.find({});
     } catch (err) {
-        return next(new HttpError('Could not fetch products, please try again.', 500))
+        return next(new HttpError(
+            'Could not fetch products, please try again.',
+            500
+        ))
     }
 
-    res.json({ products: products.map(u => u.toObject({ getters: true })) })
+    res.json({ products: products.map(u => u.toObject({ getters: true })) });
 
 
 }
@@ -31,7 +32,10 @@ const getProductByCode = async (req, res, next) => {
     try {
         products = await Product.find({ code: productId })
     } catch (err) {
-        return next(new HttpError('Something went wrong, could not find product', 500))
+        return next(new HttpError(
+            'Something went wrong, could not find product',
+            500
+        ))
     }
 
     res.json({ products: products.map(u => u.toObject({ getters: true })) })
@@ -40,13 +44,26 @@ const getProductByCode = async (req, res, next) => {
 
 const getProductByName = async (req, res, next) => {
     const name = req.params.pid;
-    let re = `/${name}/i`;
     let products;
     try {
         products = await Product.find({ name: { $regex: name, $options: 'i' } })
 
     } catch (err) {
-        return next(new HttpError('Something went wrong, could not find product', 500))
+        return next(new HttpError(
+            'Something went wrong on our side. Please try again later',
+            500
+        ))
+    }
+
+    try {
+        if (products.length < 1) {
+            throw new HttpError();
+        }
+    } catch (err) {
+        return next(new HttpError(
+            'Sorry but this product is not in our database',
+            404
+        ))
     }
 
     res.json({ products: products.map(u => u.toObject({ getters: true })) })
@@ -64,7 +81,10 @@ const createProduct = async (req, res, next) => {
     try {
         admin = await Admin.findById(adminId);
     } catch (err) {
-        return next(new HttpError('Authentication failed!', 503))
+        return next(new HttpError(
+            'Authentication failed!',
+            503
+        ))
     }
 
     let code;
@@ -99,7 +119,10 @@ const createProduct = async (req, res, next) => {
     try {
         createdProduct.save()
     } catch (err) {
-        return next(new HttpError('Creating product failed, please try again.', 500))
+        return next(new HttpError(
+            'Creating product failed, please try again.',
+            500
+        ))
     }
     res.status(201).json({ message: 'Product has been added.' })
 
@@ -113,7 +136,10 @@ const updateProduct = async (req, res, next) => {
     const errors = validationResult(req)
     console.log(errors)
     if (!errors.isEmpty()) {
-        return next(new HttpError('Invalid inputs passed, please check your data', 422))
+        return next(new HttpError(
+            'Invalid inputs passed, please check your data',
+            422
+        ))
     }
     const { name, unit, price, code } = req.body;
 
@@ -140,7 +166,7 @@ const updateProduct = async (req, res, next) => {
     } catch (err) {
         return next(new HttpError(
             'Something went wrong, could not update product',
-            503
+            500
         ))
     }
 
@@ -153,7 +179,7 @@ const updateProduct = async (req, res, next) => {
     } catch (err) {
         return next(new HttpError(
             'Something went wrong, could not update product',
-            503
+            500
         ))
     }
 
@@ -179,7 +205,10 @@ const deleteProduct = async (req, res, next) => {
     try {
         await Product.deleteOne({ code: code });
     } catch (err) {
-        return next(new HttpError('Could not delete product, please try again.', 500))
+        return next(new HttpError(
+            'Could not delete product, please try again.',
+            500
+        ))
     }
 
     res.json({ message: 'Product has been deleted.' })

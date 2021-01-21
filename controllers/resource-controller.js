@@ -1,11 +1,11 @@
-const HttpError = require("../models/http-error");
-
 const { validationResult } = require('express-validator');
 
+const HttpError = require("../models/http-error");
 
 const Admin = require('../models/admin');
 const Resource = require('../models/resource')
 
+//send over image paths(carousel)
 const getImages = async (req, res, next) => {
 
     const resourcePlace = req.params.pid;
@@ -16,19 +16,20 @@ const getImages = async (req, res, next) => {
     } catch (err) {
         return next(new HttpError(
             'Sorry something went wrong.',
-            401
+            500
         ))
     }
 
     res.json({ images: images })
 }
 
+//new resource creation.
 const imageUpload = async (req, res, next) => {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
         return next(new HttpError(
             'Invalid inputs passed, please check your data',
-            422
+            503
         ))
     }
 
@@ -57,7 +58,7 @@ const imageUpload = async (req, res, next) => {
     } catch (err) {
         return next(new HttpError(
             'Sorry something went wrong. Please try again later',
-            503
+            500
         ))
     }
 
