@@ -1,5 +1,5 @@
 const express = require('express');
-const { check } = require('express-validator')
+const { check, sanitize, sanitizeBody, body } = require('express-validator')
 const checkAuth = require('../middleware/check-auth');
 
 const usersController = require('../controllers/users-controller')
@@ -15,12 +15,17 @@ router.get('/signout/:pid', usersController.signout)
 
 router.post('/signup',
     [
-        check('fullName').not().isEmpty(),
+        body('*').trim().escape(),
+        check('firstName').not().isEmpty(),
+        check('lastName').not().isEmpty(),
         check('email').normalizeEmail().isEmail(),
         check('password').isLength({ min: 6 }),
         check('phone').not().isEmpty(),
-        check('address').not().isEmpty(),
-        check('hint').not().isEmpty(),
+        check('city').not().isEmpty(),
+        check('street').not().isEmpty(),
+        check('postCode').not().isEmpty(),
+        check('houseNumber').not().isEmpty(),
+        check('hint').not().isEmpty().escape(),
         check('answer').isLength({ min: 4 })
     ],
     usersController.signup
@@ -28,6 +33,7 @@ router.post('/signup',
 
 router.post('/contact',
     [
+        body('*').trim().escape(),
         check('name').not().isEmpty(),
         check('email').normalizeEmail().isEmail(),
         check('message').not().isEmpty()
@@ -43,7 +49,7 @@ router.use(checkAuth);
 
 router.post('/favourites/:pid',
     [
-        check('productId').not().isEmpty()
+        check('productId').not().isEmpty().escape().trim()
     ],
     usersController.favouritesHandler
 );
@@ -52,6 +58,7 @@ router.get('/userinfo/:pid', usersController.getUserInfo)
 
 
 router.patch('/updatedata/:pid', [
+    body('*').trim().escape(),
     check('fullName').not().isEmpty(),
     check('email').normalizeEmail().isEmail(),
     check('phone').not().isEmpty(),

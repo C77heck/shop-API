@@ -13,7 +13,7 @@ router.get('/bycode/:pid', adminsController.getProduct)//product fetch for updat
 
 router.post('/adminsignin',
     [
-        check('accountID').not().isEmpty(),
+        check('accountID').not().isEmpty().escape().trim(),
         check('password').not().isEmpty()
 
     ], adminsController.adminSignin);

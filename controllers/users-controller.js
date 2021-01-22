@@ -23,14 +23,24 @@ const Recovery = require('../models/recovery');
 const signup = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        const error = new HttpError(
-            'Invalid inputs passed, please check your data',
+        return next(new HttpError(
+            `Invalid inputs passed, please check your data`,
             422
-        )
-        return next(error)
+        ))
     }
-
-    const { fullName, email, password, phone, address, hint, answer } = req.body;
+    const {
+        firstName,
+        lastName,
+        email,
+        password,
+        phone,
+        city,
+        street,
+        postCode,
+        houseNumber,
+        hint,
+        answer
+    } = req.body;
 
     let existingUser;
     try {
@@ -61,7 +71,12 @@ const signup = async (req, res, next) => {
 
     let coordinates;
     try {
-        coordinates = await getCoordsForAddress(address)
+        coordinates = await getCoordsForAddress({
+            city: city,
+            street: street,
+            postCode: postCode,
+            houseNumber: houseNumber
+        })
     } catch (error) {
 
         return next(error)
@@ -69,17 +84,17 @@ const signup = async (req, res, next) => {
 
     const createdUser = new User({
         fullName: {
-            firstName: fullName.firstName,
-            lastName: fullName.lastName
+            firstName: firstName,
+            lastName: lastName
         },
         email,
         password: hashedPassword,
         phone,
         address: {
-            city: address.city,
-            street: address.street,
-            postCode: address.postCode,
-            houseNumber: address.houseNumber
+            city: city,
+            street: street,
+            postCode: postCode,
+            houseNumber: houseNumber
         },
         location: coordinates,
         instructions: '',
@@ -460,7 +475,7 @@ const contact = (req, res, next) => {
             , 503
         ))
     }
-    res.json({ message: 'Thank you for getting touch. we will respond as soon as we can.' })
+    res.json({ message: 'Thank you for getting in touch. we will respond as soon as we can.' })
 
 }
 

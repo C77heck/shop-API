@@ -14,9 +14,9 @@ router.get('/letters/:pid', productsControllers.getProductByName)
 router.post('/:pid',
     fileUpload.single('image'),
     [
-        check('name').not().isEmpty(),
-        check('unit').not().isEmpty(),
-        check('price').not().isEmpty()
+        check('name').not().isEmpty().escape().trim(),
+        check('unit').not().isEmpty().escape().trim(),
+        check('price').not().isEmpty().escape().trim()
     ],
     productsControllers.createProduct
 );
@@ -24,15 +24,15 @@ router.post('/:pid',
 router.patch('/:pid',
     fileUpload.single('image'),
     [
-        check('name').not().isEmpty(),
-        check('unit').not().isEmpty(),
-        check('price').not().isEmpty()
+        check('name').not().isEmpty().escape().trim(),
+        check('unit').not().isEmpty().escape().trim(),
+        check('price').not().isEmpty().escape().trim()
     ],
     productsControllers.updateProduct
 );
 
 router.delete('/:pid', [
-    check('code').not().isEmpty()
+    check('code').not().isEmpty().escape().trim()
 ], productsControllers.deleteProduct
 );
 

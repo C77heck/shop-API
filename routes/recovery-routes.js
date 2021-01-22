@@ -13,8 +13,8 @@ router.get('/blockaccount/:pid',
 );
 
 //hint fetch for the security question display
-router.get('/gethint/:pid', 
-recoveryController.getHint
+router.get('/gethint/:pid',
+    recoveryController.getHint
 )
 
 //send a password recovery link to the given email
@@ -27,7 +27,7 @@ router.post('/passwordrecovery',
 router.patch('/updatepassword/:pid',
     [
         check('password').isLength({ min: 6 }),
-        check('answer').isLength({ min: 4 })
+        check('answer').isLength({ min: 4 }).escape().trim()
     ],
     recoveryController.PasswordReset
 );
@@ -35,8 +35,8 @@ router.patch('/updatepassword/:pid',
 
 router.post('/userresetpassword/',
     [
-        check('userId').not().isEmpty(),
-        check('answer').isLength({ min: 4 }),
+        check('userId').not().isEmpty().escape().trim(),
+        check('answer').isLength({ min: 4 }).escape().trim(),
         check('oldPassword').isLength({ min: 6 }),
         check('newPassword').isLength({ min: 6 })
     ],

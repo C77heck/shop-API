@@ -14,7 +14,7 @@ router.get('/images/:pid', resourceController.getImages)
 router.post('/:pid',
     fileUpload.single('image'),
     [
-        check('name').not().isEmpty()
+        check('name').not().isEmpty().escape().trim()
     ],
     resourceController.imageUpload
 )
