@@ -13,13 +13,6 @@ const HttpError = require('../models/http-error');
 const User = require('../models/user');
 const Recovery = require('../models/recovery');
 
-
-
-
-
-
-
-
 const signup = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -230,8 +223,6 @@ const signin = async (req, res, next) => {
         existingUser.save();
     }
 
-
-
     let token;
     try {
         token = jwt.sign({ userId: existingUser.id, email: existingUser.email },
@@ -253,18 +244,12 @@ const signin = async (req, res, next) => {
             favourites: existingUser.favourites
         }
     })
-
-
-
-
 }
 
-
-
 const signout = async (req, res, next) => {
-
     const userId = req.params.pid;
     const errors = validationResult(req);
+
     if (!errors.isEmpty()) {
         return next(new HttpError(
             'Invalid inputs passed, please check your data',
@@ -273,7 +258,6 @@ const signout = async (req, res, next) => {
     }
 
     let user;
-
     try {
         user = await User.findById(userId)
     } catch (err) {
@@ -311,8 +295,6 @@ const updateUserData = async (req, res, next) => {
         ))
     }
 
-
-
     let coordinates;
     try {
         coordinates = await getCoordsForAddress(address)
@@ -328,7 +310,6 @@ const updateUserData = async (req, res, next) => {
     } catch (err) {
         return next(new HttpError('Incorrect answer!', 401))
     }
-
 
     if (user !== null) {
         try {
@@ -403,7 +384,6 @@ const getUserInfo = async (req, res, next) => {
         return next(new HttpError(err))
     }
 
-
     res.json({ userData: user })
 }
 
@@ -435,7 +415,6 @@ const getUserHint = async (req, res, next) => {
 }
 
 const favouritesHandler = async (req, res, next) => {
-
     const userId = req.params.pid;
     const { productId } = req.body;
 
@@ -475,8 +454,8 @@ const contact = (req, res, next) => {
             , 503
         ))
     }
+    
     res.json({ message: 'Thank you for getting in touch. we will respond as soon as we can.' })
-
 }
 
 
